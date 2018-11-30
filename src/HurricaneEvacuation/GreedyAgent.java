@@ -2,6 +2,14 @@ package HurricaneEvacuation;
 
 class GreedyAgent extends Agent {
 
-    GreedyAgent() {
+    GreedyAgent(int agentNum) {
+        this.agentNum = agentNum;
+    }
+
+    @Override
+    public void makeOperation() {
+
+
+
     }
 }

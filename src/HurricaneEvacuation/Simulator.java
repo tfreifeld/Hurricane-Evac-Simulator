@@ -20,6 +20,7 @@ public class Simulator {
 
 
         graph.displayWorldState();
+        agents.get(0).makeOperation();
 
 
     }
@@ -44,15 +45,15 @@ public class Simulator {
             switch (agentType) {
 
                 case "h": {
-                    agents.add(new HumanAgent());
+                    agents.add(new HumanAgent(i + 1));
                     break;
                 }
                 case "g": {
-                    agents.add(new GreedyAgent());
+                    agents.add(new GreedyAgent(i + 1));
                     break;
                 }
                 case "v": {
-                    agents.add(new VandalAgent());
+                    agents.add(new VandalAgent(i + 1));
                     break;
                 }
             }
@@ -71,12 +72,14 @@ public class Simulator {
                                         + " vertices.");
                         continue;
                     }
+                    agents.get(i).setLocation(graph.getVertex(startVertex));
                     break;
                 } catch (InputMismatchException e) {
                     sc.next();
                     System.out.println("Invalid option.");
                 }
             }
+
         }
 
         System.out.println("Please enter the \"slow-down\" constant: ");

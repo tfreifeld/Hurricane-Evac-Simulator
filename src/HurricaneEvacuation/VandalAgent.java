@@ -2,6 +2,12 @@ package HurricaneEvacuation;
 
 class VandalAgent extends Agent {
 
-    VandalAgent() {
+    VandalAgent(int agentNum) {
+        this.agentNum = agentNum;
+    }
+
+    @Override
+    void makeOperation() {
+
     }
 }

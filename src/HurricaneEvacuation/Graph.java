@@ -62,7 +62,6 @@ class Graph {
 
         sc.close();
 
-
     }
 
     private void readDeadline() {
@@ -79,7 +78,7 @@ class Graph {
             vertices.get(vertexNum).setPersons(persons);
 
         } else if (sc.hasNext("S")){
-            vertices.get(vertexNum).setShelter(true);
+            vertices.get(vertexNum).setShelter();
         }
     }
 
@@ -93,7 +92,7 @@ class Graph {
         new Edge(vertices.get(in), vertices.get(out),weight);
     }
 
-    private void readNumOfVertices() {
+    private void readNumOfVertices() throws IOException{
 
         if (sc.hasNext(vertexEncoding)){
 
@@ -101,7 +100,7 @@ class Graph {
             int numOfVertices = sc.nextInt();
             vertices.add(null);
             for (int i = 1; i <= numOfVertices; i++) {
-                vertices.add(i,new Vertex(0, false, new ArrayList<>()));
+                vertices.add(i,new Vertex(i));
             }
 
             sc.nextLine();
@@ -142,5 +141,9 @@ class Graph {
 
         return vertices.size() - 1;
 
+    }
+
+    Vertex getVertex(int index){
+        return vertices.get(index);
     }
 }
