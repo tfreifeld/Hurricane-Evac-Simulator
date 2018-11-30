@@ -7,7 +7,8 @@ class VandalAgent extends Agent {
     }
 
     @Override
-    void makeOperation() {
+    Move makeOperation() {
 
+        return null;
     }
 }

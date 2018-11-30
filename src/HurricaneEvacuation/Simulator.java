@@ -8,8 +8,12 @@ import java.util.Scanner;
 public class Simulator {
 
     private static ArrayList<Agent> agents = new ArrayList<>();
-    private static Graph graph;
     private static float kfactor;
+    static Graph graph;
+    private static int safeCount = 0;
+    static double time = 0;
+    static Scanner sc = new Scanner(System.in);
+
 
     public static void main(String[] args) {
 
@@ -20,14 +24,33 @@ public class Simulator {
 
 
         graph.displayWorldState();
-        agents.get(0).makeOperation();
+        makeMove(agents.get(0).makeOperation());
+        graph.displayWorldState();
 
+
+        sc.close();
+
+
+    }
+
+    private static void makeMove(Move move){
+
+        move.getAgent().setLocation(move.getTarget());
+        if (move.getTarget().isShelter()) {
+            safeCount += move.getAgent().getCarrying();
+            move.getAgent().setCarrying(0);
+        }
+        else{
+            move.getAgent().setCarrying(move.getTarget().getPersons());
+            move.getTarget().setPersons(0);
+        }
+
+        //TODO: increase time
 
     }
 
     private static void readInputFromUser() {
 
-        Scanner sc = new Scanner(System.in);
         System.out.println("Please enter the number of agents: ");
         int numOfAgents = sc.nextInt();
         for (int i = 0; i < numOfAgents; i++) {
@@ -97,7 +120,5 @@ public class Simulator {
             }
         }
         System.out.println();
-
-        sc.close();
     }
 }

@@ -1,9 +1,7 @@
 package HurricaneEvacuation;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.util.*;
 
 class Graph {
 
@@ -13,7 +11,7 @@ class Graph {
     static final String ignoreNonDigitsRegex = "[^0-9]*";
 
     private Scanner sc;
-    ArrayList<Vertex> vertices = new ArrayList<>();
+    HashMap<Integer,Vertex> vertices = new HashMap<>();
     int deadline;
 
 
@@ -98,9 +96,8 @@ class Graph {
 
             sc.skip(vertexEncoding);
             int numOfVertices = sc.nextInt();
-            vertices.add(null);
             for (int i = 1; i <= numOfVertices; i++) {
-                vertices.add(i,new Vertex(i));
+                vertices.put(i,new Vertex(i));
             }
 
             sc.nextLine();
@@ -113,10 +110,10 @@ class Graph {
 
     void displayWorldState(){
 
-        for (int i = 1; i < vertices.size(); i++) {
-            Vertex v = vertices.get(i);
+        for (Vertex v: vertices.values()) {
 
-            System.out.printf("Vertex No. %d: %d people", i, v.getPersons());
+            System.out.printf("Vertex No. %d: %d people",
+                    v.getId(), v.getPersons());
             if (v.isShelter()){
                 System.out.print(" ; has shelter.");
             }
@@ -125,7 +122,7 @@ class Graph {
             for (int j = 0; j < edges.size(); j++) {
                 Edge e = edges.get(j);
 
-                System.out.printf("%d", vertices.indexOf(e.getNeighbour(v)));
+                System.out.printf("%d", e.getNeighbour(v).getId());
                 if (e.isBlocked()) {
                     System.out.print(" - blocked");
                 }

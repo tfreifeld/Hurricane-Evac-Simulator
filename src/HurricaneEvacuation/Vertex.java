@@ -61,6 +61,28 @@ class Vertex {
         return neighbours;
     }
 
+    boolean hasNeighbour(int id){
+
+        for (Vertex v: getNeighbours()) {
+
+            if (v.getId() == id)
+                return true;
+        }
+
+        return false;
+    }
+
+    /*Vertex getNeighbour(int id){
+
+        for (Edge e: getEdges()) {
+
+            if (e.getNeighbour(this).getId() == id)
+                return e;
+        }
+
+        return null;
+    }*/
+
     String getNeighboursToString(){
 
         ArrayList<Vertex> temp = getNeighbours();
