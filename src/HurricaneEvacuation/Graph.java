@@ -108,7 +108,7 @@ class Graph {
         }
     }
 
-    void displayWorldState(){
+    void displayGraphState(){
 
         for (Vertex v: vertices.values()) {
 

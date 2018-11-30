@@ -11,4 +11,9 @@ class VandalAgent extends Agent {
 
         return null;
     }
+
+    @Override
+    public String toString() {
+        return "{Type: Vandal\n" + super.toString();
+    }
 }

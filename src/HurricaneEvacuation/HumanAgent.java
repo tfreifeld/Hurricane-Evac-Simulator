@@ -32,4 +32,9 @@ class HumanAgent extends Agent {
 
         return new Move(this, Simulator.graph.getVertex(targetVertex));
     }
+
+    @Override
+    public String toString() {
+            return "{Type: Human\n" + super.toString();
+    }
 }

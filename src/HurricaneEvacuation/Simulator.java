@@ -22,13 +22,13 @@ public class Simulator {
 
         readInputFromUser();
 
+        while(true) {
+            displayWorldState();
+            makeMove(agents.get(0).makeOperation());
+        }
 
-        graph.displayWorldState();
-        makeMove(agents.get(0).makeOperation());
-        graph.displayWorldState();
 
-
-        sc.close();
+        //sc.close();
 
 
     }
@@ -41,11 +41,14 @@ public class Simulator {
             move.getAgent().setCarrying(0);
         }
         else{
-            move.getAgent().setCarrying(move.getTarget().getPersons());
+            move.getAgent().setCarrying(move.getAgent().getCarrying() +
+                    move.getTarget().getPersons());
             move.getTarget().setPersons(0);
         }
 
         //TODO: increase time
+
+        move.getAgent().increaseMoves();
 
     }
 
@@ -120,5 +123,22 @@ public class Simulator {
             }
         }
         System.out.println();
+    }
+
+    static void displayWorldState(){
+
+        graph.displayGraphState();
+
+        for (Agent agent:agents) {
+            System.out.println("Agent " + agent.getAgentNum() + ":");
+            System.out.println(agent.toString());
+            System.out.println();
+        }
+
+        System.out.println(safeCount + " people are safe");
+
+        System.out.println("Time: " + time);
+        System.out.println();
+
     }
 }

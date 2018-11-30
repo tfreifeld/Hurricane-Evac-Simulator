@@ -4,8 +4,8 @@ abstract class Agent {
 
     int agentNum;
     Vertex location;
-    protected int carrying = 0;
-    int numOfMoves = 0;
+    private int carrying = 0;
+    private int numOfMoves = 0;
 
     abstract Move makeOperation();
 
@@ -13,7 +13,7 @@ abstract class Agent {
         this.location = location;
     }
 
-    public int getAgentNum() {
+    int getAgentNum() {
         return agentNum;
     }
 
@@ -25,15 +25,25 @@ abstract class Agent {
         return carrying;
     }
 
-    public void setCarrying(int carrying) {
-        this.carrying += carrying;
+    void setCarrying(int carrying) {
+
+        this.carrying = carrying;
     }
 
-    public int getNumOfMoves() {
+    private int getNumOfMoves() {
         return numOfMoves;
     }
 
-    public void increaseMoves() {
+    void increaseMoves() {
         this.numOfMoves++;
+    }
+
+    @Override
+    public String toString() {
+
+        return "Location: " + getLocation().getId() + "\n"
+                + "Carrying: " + getCarrying() + "\n"
+                + "Number of moves: " + getNumOfMoves() + "}";
+
     }
 }

@@ -13,4 +13,9 @@ class GreedyAgent extends Agent {
         return null;
 
     }
+
+    @Override
+    public String toString() {
+        return "{Type: Human\n" + super.toString();
+    }
 }
