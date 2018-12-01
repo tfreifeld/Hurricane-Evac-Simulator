@@ -5,7 +5,7 @@ abstract class Agent {
     int agentNum;
     Vertex location;
     private int carrying = 0;
-    private int numOfMoves = -1;
+    private int numOfMoves = 0;
 
     abstract Move makeOperation();
 

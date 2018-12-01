@@ -1,20 +1,26 @@
 package HurricaneEvacuation;
 
-public class Move {
+class Move {
 
-    final Agent agent;
-    final Vertex target;
+    private final Agent agent;
+    private final Vertex target;
+    private final Edge edge;
 
-    public Move(Agent agent, Vertex target) {
+    Move(Agent agent, Vertex target, Edge edge) {
         this.agent = agent;
         this.target = target;
+        this.edge = edge;
     }
 
-    public Agent getAgent() {
+    Agent getAgent() {
         return agent;
     }
 
-    public Vertex getTarget() {
+    Vertex getTarget() {
         return target;
+    }
+
+    Edge getEdge() {
+        return edge;
     }
 }

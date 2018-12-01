@@ -1,28 +1,28 @@
 package HurricaneEvacuation;
 
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 class Vertex {
 
     private int id;
     private int persons;
     private boolean shelter;
-    private ArrayList<Edge> edges;
-    private ArrayList<Vertex> neighbours;
-
+    private HashMap<Integer,Edge> edges;
 
     Vertex(int id) {
         this.id = id;
         this.persons = 0;
         this.shelter = false;
-        this.edges = new ArrayList<>();
-        this.neighbours = new ArrayList<>();
+        this.edges = new HashMap<>();
     }
 
     void submitEdge(Edge edge){
-        this.edges.add(edge);
-        this.neighbours.add(edge.getNeighbour(this));
+
+        this.edges.put(edge.getNeighbour(this).getId(),edge);
+
     }
 
     void setPersons(int persons) {
@@ -41,7 +41,7 @@ class Vertex {
         return shelter;
     }
 
-    ArrayList<Edge> getEdges() {
+    HashMap<Integer, Edge> getEdges() {
         return edges;
     }
 
@@ -49,52 +49,34 @@ class Vertex {
         return id;
     }
 
-    ArrayList<Vertex> getNeighbours(){
+    Set<Integer> getNeighbours(){
 
-        neighbours.sort((o1, o2) -> {
-            if (o1.getId() < o2.getId())
-                return -1;
-            else
-                return 1;
-        });
+        return edges.keySet();
 
-        return neighbours;
     }
 
-    boolean hasNeighbour(int id){
+    Edge getNeighbour(int id) throws NotNeighbourException{
 
-        for (Vertex v: getNeighbours()) {
-
-            if (v.getId() == id)
-                return true;
+        if(getNeighbours().contains(id))
+            return edges.get(id);
+        else {
+            throw new NotNeighbourException();
         }
-
-        return false;
     }
-
-    /*Vertex getNeighbour(int id){
-
-        for (Edge e: getEdges()) {
-
-            if (e.getNeighbour(this).getId() == id)
-                return e;
-        }
-
-        return null;
-    }*/
 
     String getNeighboursToString(){
 
-        ArrayList<Vertex> temp = getNeighbours();
+        Iterator<Integer> iterator = getNeighbours().iterator();
 
         StringBuilder ans = new StringBuilder("[");
-        for (int i = 0; i < temp.size(); i++) {
-            Vertex v = temp.get(i);
-            ans.append(v.toString());
-            if (i < temp.size() - 1){
+
+        while (iterator.hasNext()){
+            ans.append(iterator.next());
+            if (iterator.hasNext()){
                 ans.append(", ");
             }
         }
+
         ans.append("]");
         return ans.toString();
     }
@@ -102,5 +84,8 @@ class Vertex {
     @Override
     public String toString() {
         return String.valueOf(this.id);
+    }
+
+    class NotNeighbourException extends Throwable {
     }
 }

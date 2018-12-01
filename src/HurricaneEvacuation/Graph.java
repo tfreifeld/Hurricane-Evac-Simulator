@@ -12,9 +12,8 @@ class Graph {
 
     private Scanner sc;
     HashMap<Integer,Vertex> vertices = new HashMap<>();
-    int deadline;
 
-
+    private int deadline;
 
     Graph(File file) {
 
@@ -118,17 +117,22 @@ class Graph {
                 System.out.print(" ; has shelter.");
             }
             System.out.print("\nNeighbours: {");
-            ArrayList<Edge> edges = v.getEdges();
-            for (int j = 0; j < edges.size(); j++) {
-                Edge e = edges.get(j);
 
-                System.out.printf("%d", e.getNeighbour(v).getId());
-                if (e.isBlocked()) {
+            Iterator<Integer> neighboursIterator = v.getNeighbours().iterator();
+
+            while (neighboursIterator.hasNext()){
+
+                int neighbourId = neighboursIterator.next();
+
+                System.out.printf("%d", neighbourId);
+
+                if (v.getEdges().get(neighbourId).isBlocked()) {
                     System.out.print(" - blocked");
                 }
-                if (j < edges.size() - 1)
+                if (neighboursIterator.hasNext())
                     System.out.print(", ");
             }
+
             System.out.println("}\n");
 
         }
@@ -143,4 +147,9 @@ class Graph {
     Vertex getVertex(int index){
         return vertices.get(index);
     }
+
+    public int getDeadline() {
+        return deadline;
+    }
+
 }

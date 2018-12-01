@@ -26,6 +26,9 @@ class Edge {
         } else {
             return in;
         }
+    }
 
+    public int getWeight() {
+        return weight;
     }
 }

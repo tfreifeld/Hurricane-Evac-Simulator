@@ -8,10 +8,10 @@ import java.util.Scanner;
 public class Simulator {
 
     private static ArrayList<Agent> agents = new ArrayList<>();
-    private static float kfactor;
+    private static float kFactor;
     static Graph graph;
     private static int safeCount = 0;
-    static double time = 0;
+    private static double time = 0;
     static Scanner sc = new Scanner(System.in);
 
 
@@ -22,9 +22,11 @@ public class Simulator {
 
         readInputFromUser();
 
-        while(true) {
-            displayWorldState();
+        displayWorldState();
+
+        while(time < graph.getDeadline()) {
             makeMove(agents.get(0).makeOperation());
+            displayWorldState();
         }
 
 
@@ -35,21 +37,35 @@ public class Simulator {
 
     private static void makeMove(Move move){
 
+        if (move.getEdge().isBlocked()){
+            time++;
+        }
+        else {
+            double tempTime =
+                    time + move.getEdge().getWeight() * (1 + kFactor * move.getAgent().getCarrying());
+            if (!(tempTime > graph.getDeadline())) {
+                traverse(move);
+                time = tempTime;
+            }
+            else{
+                time++;
+            }
+        }
+
+        move.getAgent().increaseMoves();
+
+    }
+
+    private static void traverse(Move move) {
         move.getAgent().setLocation(move.getTarget());
         if (move.getTarget().isShelter()) {
             safeCount += move.getAgent().getCarrying();
             move.getAgent().setCarrying(0);
-        }
-        else{
+        } else {
             move.getAgent().setCarrying(move.getAgent().getCarrying() +
                     move.getTarget().getPersons());
             move.getTarget().setPersons(0);
         }
-
-        //TODO: increase time
-
-        move.getAgent().increaseMoves();
-
     }
 
     private static void readInputFromUser() {
@@ -102,7 +118,7 @@ public class Simulator {
                         System.out.println("Invalid option.");
                         continue;
                     }
-                    makeMove(new Move(agents.get(i),graph.getVertex(startVertex)));
+                    traverse(new Move(agents.get(i),graph.getVertex(startVertex), null));
                     //agents.get(i).setLocation(graph.getVertex(startVertex));
                     break;
                 } catch (InputMismatchException e) {
@@ -116,8 +132,8 @@ public class Simulator {
         System.out.println("Please enter the \"slow-down\" constant: ");
         while(true){
             try{
-                kfactor = sc.nextFloat();
-                if (kfactor < 0){
+                kFactor = sc.nextFloat();
+                if (kFactor < 0){
                     System.out.println("K must be non-negative.");
                     continue;
                 }

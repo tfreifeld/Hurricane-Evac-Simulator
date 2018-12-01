@@ -16,21 +16,21 @@ class HumanAgent extends Agent {
                         + location.getNeighboursToString() + " to move to: ");
 
         int targetVertex;
+        Edge edge;
         while(true) {
             try {
                  targetVertex = Simulator.sc.nextInt();
-                 if (!location.hasNeighbour(targetVertex)){
-                     System.out.println("Not a neighbour.");
-                     continue;
-                 }
+                 edge = location.getNeighbour(targetVertex);
                  break;
             } catch (InputMismatchException e) {
                 Simulator.sc.next();
                 System.out.println("Invalid option.");
+            } catch (Vertex.NotNeighbourException e) {
+                System.out.println("Not a neighbour.");
             }
         }
 
-        return new Move(this, Simulator.graph.getVertex(targetVertex));
+        return new Move(this, Simulator.graph.getVertex(targetVertex), edge);
     }
 
     @Override
