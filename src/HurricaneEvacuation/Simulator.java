@@ -98,7 +98,12 @@ public class Simulator {
                                         + " vertices.");
                         continue;
                     }
-                    agents.get(i).setLocation(graph.getVertex(startVertex));
+                    else if (startVertex <= 0){
+                        System.out.println("Invalid option.");
+                        continue;
+                    }
+                    makeMove(new Move(agents.get(i),graph.getVertex(startVertex)));
+                    //agents.get(i).setLocation(graph.getVertex(startVertex));
                     break;
                 } catch (InputMismatchException e) {
                     sc.next();

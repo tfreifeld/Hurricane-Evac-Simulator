@@ -136,7 +136,7 @@ class Graph {
 
     int getNumberOfVertices(){
 
-        return vertices.size() - 1;
+        return vertices.size();
 
     }
 
