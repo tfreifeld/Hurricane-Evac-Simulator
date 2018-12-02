@@ -11,6 +11,7 @@ class Edge {
         this.in = in;
         this.out = out;
         this.weight = weight;
+        this.blocked = false;
 
         in.submitEdge(this);
         out.submitEdge(this);
@@ -28,7 +29,11 @@ class Edge {
         }
     }
 
-    public int getWeight() {
+    int getWeight() {
         return weight;
+    }
+
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
     }
 }

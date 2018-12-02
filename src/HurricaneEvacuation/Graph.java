@@ -11,7 +11,7 @@ class Graph {
     static final String ignoreNonDigitsRegex = "[^0-9]*";
 
     private Scanner sc;
-    HashMap<Integer,Vertex> vertices = new HashMap<>();
+    private HashMap<Integer,Vertex> vertices = new HashMap<>();
 
     private int deadline;
 

@@ -24,10 +24,18 @@ public class Simulator {
 
         displayWorldState();
 
+        try {
+            graph.getVertex(1).getNeighbour(2).setBlocked(true);
+        } catch (Vertex.NotNeighbourException e) {
+            e.printStackTrace();
+        }
+
         while(time < graph.getDeadline()) {
             makeMove(agents.get(0).makeOperation());
             displayWorldState();
         }
+
+        System.out.println("Deadline has been reached!");
 
 
         //sc.close();
@@ -37,17 +45,24 @@ public class Simulator {
 
     private static void makeMove(Move move){
 
-        if (move.getEdge().isBlocked()){
+        if (move.getEdge() == null){
+            /*NoOp*/
+            time++;
+        }
+        else if (move.getEdge().isBlocked()){
+            /*Edge is blocked*/
             time++;
         }
         else {
             double tempTime =
                     time + move.getEdge().getWeight() * (1 + kFactor * move.getAgent().getCarrying());
             if (!(tempTime > graph.getDeadline())) {
+                /*If deadline isn't breached*/
                 traverse(move);
                 time = tempTime;
             }
             else{
+                /*If deadline is breached, traverse fails*/
                 time++;
             }
         }
@@ -75,7 +90,7 @@ public class Simulator {
         for (int i = 0; i < numOfAgents; i++) {
 
             System.out.println
-                    ("Please enter the type of the agent " + (i + 1) +
+                    ("Please enter the type of agent " + (i + 1) +
                             ". Type 'h' for human, 'g' for greedy or" +
                             " 'v' for vandal: ");
             String agentType = sc.next();

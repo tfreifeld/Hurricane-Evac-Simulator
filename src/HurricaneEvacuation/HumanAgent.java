@@ -13,15 +13,24 @@ class HumanAgent extends Agent {
     public Move makeOperation() {
 
         System.out.println("Choose a neighbour vertex from "
-                        + location.getNeighboursToString() + " to move to: ");
+                        + location.getNeighboursToString() + " to move to, or 0 for NoOp: ");
 
         int targetVertex;
         Edge edge;
         while(true) {
             try {
+
                  targetVertex = Simulator.sc.nextInt();
+                 if (targetVertex == 0){
+                     /*NoOp*/
+                     targetVertex = this.getLocation().getId();
+                     edge = null;
+                     break;
+                 }
+
                  edge = location.getNeighbour(targetVertex);
                  break;
+
             } catch (InputMismatchException e) {
                 Simulator.sc.next();
                 System.out.println("Invalid option.");

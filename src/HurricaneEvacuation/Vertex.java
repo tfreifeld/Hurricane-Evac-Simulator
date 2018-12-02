@@ -55,6 +55,12 @@ class Vertex {
 
     }
 
+    /**
+     * Returns an edge to the requested neighbour.
+     * @param id Requested neighbour's id.
+     * @return Edge to the neighbour.
+     * @throws NotNeighbourException if a neighbour with the requested id was not found.
+     */
     Edge getNeighbour(int id) throws NotNeighbourException{
 
         if(getNeighbours().contains(id))

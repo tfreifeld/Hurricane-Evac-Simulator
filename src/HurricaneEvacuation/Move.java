@@ -2,6 +2,10 @@ package HurricaneEvacuation;
 
 class Move {
 
+    /* Class implementing move intention.
+     * NoOp is represented with the current
+      * vertex, and a null edge.*/
+
     private final Agent agent;
     private final Vertex target;
     private final Edge edge;
