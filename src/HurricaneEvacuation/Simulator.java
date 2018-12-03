@@ -10,7 +10,7 @@ public class Simulator {
     private static ArrayList<Agent> agents = new ArrayList<>();
     private static float kFactor;
     static Graph graph;
-    private static int safeCount = 0;
+    static int safeCount = 0;
     private static double time = 0;
     static Scanner sc = new Scanner(System.in);
 
@@ -22,13 +22,13 @@ public class Simulator {
 
         readInputFromUser();
 
-        displayWorldState();
+//        displayWorldState();
 
-        try {
+   /*     try {
             graph.getVertex(1).getNeighbour(2).setBlocked(true);
         } catch (Vertex.NotNeighbourException e) {
             e.printStackTrace();
-        }
+        }*/
 
         while(time < graph.getDeadline()) {
             makeMove(agents.get(0).makeOperation());
@@ -58,7 +58,7 @@ public class Simulator {
                     time + move.getEdge().getWeight() * (1 + kFactor * move.getAgent().getCarrying());
             if (!(tempTime > graph.getDeadline())) {
                 /*If deadline isn't breached*/
-                traverse(move);
+                move.getAgent().traverse(move.getTarget());
                 time = tempTime;
             }
             else{
@@ -69,18 +69,6 @@ public class Simulator {
 
         move.getAgent().increaseMoves();
 
-    }
-
-    private static void traverse(Move move) {
-        move.getAgent().setLocation(move.getTarget());
-        if (move.getTarget().isShelter()) {
-            safeCount += move.getAgent().getCarrying();
-            move.getAgent().setCarrying(0);
-        } else {
-            move.getAgent().setCarrying(move.getAgent().getCarrying() +
-                    move.getTarget().getPersons());
-            move.getTarget().setPersons(0);
-        }
     }
 
     private static void readInputFromUser() {
@@ -133,7 +121,7 @@ public class Simulator {
                         System.out.println("Invalid option.");
                         continue;
                     }
-                    traverse(new Move(agents.get(i),graph.getVertex(startVertex), null));
+                    agents.get(i).traverse(graph.getVertex(startVertex));
                     //agents.get(i).setLocation(graph.getVertex(startVertex));
                     break;
                 } catch (InputMismatchException e) {
@@ -161,7 +149,7 @@ public class Simulator {
         System.out.println();
     }
 
-    static void displayWorldState(){
+    private static void displayWorldState(){
 
         graph.displayGraphState();
 
@@ -171,7 +159,12 @@ public class Simulator {
             System.out.println();
         }
 
-        System.out.println(safeCount + " people are safe");
+        if (safeCount == 1){
+            System.out.println(safeCount + " person is safe");
+        }
+        else{
+            System.out.println(safeCount + " people are safe");
+        }
 
         System.out.println("Time: " + time);
         System.out.println();

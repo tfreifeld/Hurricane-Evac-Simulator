@@ -9,8 +9,21 @@ abstract class Agent {
 
     abstract Move makeOperation();
 
-    void setLocation(Vertex location){
+    void setLocation(Vertex location) {
         this.location = location;
+    }
+
+    void traverse(Vertex target) {
+
+        setLocation(target);
+        if (target.isShelter()) {
+            Simulator.safeCount += getCarrying();
+            setCarrying(0);
+        } else {
+            setCarrying(getCarrying() + target.getPersons());
+            target.setPersons(0);
+        }
+
     }
 
     int getAgentNum() {
@@ -21,7 +34,7 @@ abstract class Agent {
         return location;
     }
 
-    public int getCarrying() {
+    int getCarrying() {
         return carrying;
     }
 
@@ -30,7 +43,7 @@ abstract class Agent {
         this.carrying = carrying;
     }
 
-    private int getNumOfMoves() {
+    int getNumOfMoves() {
         return numOfMoves;
     }
 

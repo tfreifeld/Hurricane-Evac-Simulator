@@ -33,7 +33,7 @@ class Edge {
         return weight;
     }
 
-    public void setBlocked(boolean blocked) {
+    void setBlocked(boolean blocked) {
         this.blocked = blocked;
     }
 }
