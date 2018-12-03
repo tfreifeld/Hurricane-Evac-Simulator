@@ -24,15 +24,12 @@ public class Simulator {
 
 //        displayWorldState();
 
-   /*     try {
-            graph.getVertex(1).getNeighbour(2).setBlocked(true);
-        } catch (Vertex.NotNeighbourException e) {
-            e.printStackTrace();
-        }*/
-
         while(time < graph.getDeadline()) {
-            makeMove(agents.get(0).makeOperation());
-            displayWorldState();
+            for (int i = 0; i < agents.size() && time < graph.getDeadline(); i++) {
+                Agent agent = agents.get(i);
+                makeMove(agent.makeOperation());
+                displayWorldState();
+            }
         }
 
         System.out.println("Deadline has been reached!");

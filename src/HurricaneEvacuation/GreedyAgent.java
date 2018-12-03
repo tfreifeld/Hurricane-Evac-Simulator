@@ -29,6 +29,14 @@ class GreedyAgent extends Agent {
                 this.path = new UniformSearch(getLocation(), node -> node.getLocation().isShelter()).run();
             } else {
                 this.path = new UniformSearch(getLocation(), node -> node.getLocation().getPersons() > 0).run();
+                if (this.path != null){
+                    this.path.getLocation().registerListener(new OnPeopleChangeListener() {
+                        @Override
+                        public void onPeopleChange() {
+                            path = null;
+                        }
+                    });
+                }
             }
 
             if (this.path == null){

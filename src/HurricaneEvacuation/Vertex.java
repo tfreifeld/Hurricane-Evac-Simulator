@@ -11,12 +11,14 @@ class Vertex {
     private int persons;
     private boolean shelter;
     private HashMap<Integer,Edge> edges;
+    private ArrayList<OnPeopleChangeListener> mListeners;
 
     Vertex(int id) {
         this.id = id;
         this.persons = 0;
         this.shelter = false;
         this.edges = new HashMap<>();
+        this.mListeners = new ArrayList<>();
     }
 
     void submitEdge(Edge edge){
@@ -27,6 +29,11 @@ class Vertex {
 
     void setPersons(int persons) {
         this.persons = persons;
+        if(persons == 0){
+            for (OnPeopleChangeListener listener:mListeners) {
+                listener.onPeopleChange();
+            }
+        }
     }
 
     void setShelter() {
@@ -87,6 +94,11 @@ class Vertex {
         return ans.toString();
     }
 
+    void registerListener(OnPeopleChangeListener listener){
+
+        this.mListeners.add(listener);
+    }
+
     @Override
     public String toString() {
         return String.valueOf(this.id);
@@ -94,4 +106,12 @@ class Vertex {
 
     class NotNeighbourException extends Throwable {
     }
+
+
+}
+
+interface OnPeopleChangeListener{
+
+    void onPeopleChange();
+
 }
