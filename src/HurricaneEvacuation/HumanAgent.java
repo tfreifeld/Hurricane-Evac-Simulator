@@ -39,7 +39,7 @@ class HumanAgent extends Agent {
             }
         }
 
-        return new Move(this, Simulator.graph.getVertex(targetVertex), edge);
+        return new Move(this, Simulator.getGraph().getVertex(targetVertex), edge);
     }
 
     @Override

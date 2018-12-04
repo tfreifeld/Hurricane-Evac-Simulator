@@ -5,15 +5,13 @@ import java.util.*;
 
 class Graph {
 
-    static final String edgeEncoding = "#E";
-    static final String vertexEncoding = "#V";
-    static final String deadlineEncoding = "#D";
-    static final String ignoreNonDigitsRegex = "[^0-9]*";
+    private static final String edgeEncoding = "#E";
+    private static final String vertexEncoding = "#V";
+    private static final String deadlineEncoding = "#D";
+    private static final String ignoreNonDigitsRegex = "[^0-9]*";
 
     private Scanner sc;
     private HashMap<Integer,Vertex> vertices = new HashMap<>();
-
-    private int deadline;
 
     Graph(File file) {
 
@@ -27,34 +25,30 @@ class Graph {
 
     void constructGraph(){
 
-        try {
-            readNumOfVertices();
+        readNumOfVertices();
 
-            while(sc.hasNextLine()){
+        while(sc.hasNextLine()){
 
 
-                if (sc.hasNext(edgeEncoding)){
+            if (sc.hasNext(edgeEncoding)){
 
-                    readEdge();
+                readEdge();
 
-                }
-                else if (sc.hasNext(vertexEncoding)){
-
-                    readVertex();
-
-                }
-                else if (sc.hasNext(deadlineEncoding)){
-                    readDeadline();
-                }
-                else{
-
-                    throw new InputMismatchException("Unknown input parameter");
-
-                }
-                sc.nextLine();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            else if (sc.hasNext(vertexEncoding)){
+
+                readVertex();
+
+            }
+            else if (sc.hasNext(deadlineEncoding)){
+                readDeadline();
+            }
+            else{
+
+                throw new InputMismatchException("Unknown input parameter");
+
+            }
+            sc.nextLine();
         }
 
         sc.close();
@@ -63,7 +57,7 @@ class Graph {
 
     private void readDeadline() {
         sc.skip(deadlineEncoding);
-        deadline = sc.nextInt();
+        Simulator.setDeadline(sc.nextInt());
     }
 
     private void readVertex() {
@@ -73,6 +67,7 @@ class Graph {
             sc.skip(ignoreNonDigitsRegex);
             int persons = sc.nextInt();
             vertices.get(vertexNum).setPersons(persons);
+            Simulator.increaseTotalPeople(persons);
 
         } else if (sc.hasNext("S")){
             vertices.get(vertexNum).setShelter();
@@ -89,7 +84,7 @@ class Graph {
         new Edge(vertices.get(in), vertices.get(out),weight);
     }
 
-    private void readNumOfVertices() throws IOException{
+    private void readNumOfVertices() /*throws IOException*/{
 
         if (sc.hasNext(vertexEncoding)){
 
@@ -146,10 +141,6 @@ class Graph {
 
     Vertex getVertex(int index){
         return vertices.get(index);
-    }
-
-    public int getDeadline() {
-        return deadline;
     }
 
 }

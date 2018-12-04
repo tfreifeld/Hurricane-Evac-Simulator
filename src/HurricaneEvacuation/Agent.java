@@ -17,7 +17,7 @@ abstract class Agent {
 
         setLocation(target);
         if (target.isShelter()) {
-            Simulator.safeCount += getCarrying();
+            Simulator.setSafeCount(Simulator.getSafeCount() + getCarrying());
             setCarrying(0);
         } else {
             setCarrying(getCarrying() + target.getPersons());

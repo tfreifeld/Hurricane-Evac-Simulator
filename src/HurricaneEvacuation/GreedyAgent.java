@@ -15,6 +15,8 @@ class GreedyAgent extends Agent {
     @Override
     public Move makeOperation() {
 
+        //TODO: add support for edges that become block along the run
+
         if (this.path != null) {
             if (this.path.getLocation().equals(this.getLocation())) {
                 /*If target has been reached, need to choose new target */
@@ -67,7 +69,7 @@ class GreedyAgent extends Agent {
         return "{Type: Greedy\n" + super.toString();
     }
 
-    static class UniformSearch extends Search {
+    static private class UniformSearch extends Search {
 
         UniformSearch(Vertex location, Predicate<Node> goalTest) {
             super(goalTest);
@@ -77,24 +79,26 @@ class GreedyAgent extends Agent {
 
         @Override
         Node getChildNode(Edge edge) {
-            return new UniformSearchNode(edge.getNeighbour(node.getLocation()), node, edge);
+            return new UniformSearchNode(edge.getNeighbour(node.getLocation()), (UniformSearchNode) node, edge);
         }
     }
 
-    static class UniformSearchNode extends Node {
+    static private class UniformSearchNode extends Node {
 
         UniformSearchNode(Vertex location) {
             super(location);
         }
 
-        UniformSearchNode(Vertex location, Node parent, Edge edge) {
-            super(location, parent, edge);
+        UniformSearchNode(Vertex location, UniformSearchNode parent, Edge edge) {
+            super(location, parent);
+            this.pathCost = parent.getPathCost() + edge.getWeight();
+
         }
 
         @Override
         public int compareTo(Node o) {
 
-            int result = Integer.compare(this.getPathCost(), o.getPathCost());
+            int result = Float.compare(this.getPathCost(), o.getPathCost());
             if (result == 0) {
                 /* If nodes have the same path cost, compare according to number of people */
                 return Integer.compare(o.getLocation().getPersons(), this.getLocation().getPersons());

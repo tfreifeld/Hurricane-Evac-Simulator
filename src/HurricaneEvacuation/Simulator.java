@@ -8,10 +8,14 @@ import java.util.Scanner;
 public class Simulator {
 
     private static ArrayList<Agent> agents = new ArrayList<>();
-    private static float kFactor;
-    static Graph graph;
-    static int safeCount = 0;
+
+    private static Graph graph;
+    private static int deadline;
     private static double time = 0;
+    private static int safeCount = 0;
+    private static int totalPeople = 0;
+    private static float kFactor;
+
     static Scanner sc = new Scanner(System.in);
 
 
@@ -22,10 +26,9 @@ public class Simulator {
 
         readInputFromUser();
 
-//        displayWorldState();
 
-        while(time < graph.getDeadline()) {
-            for (int i = 0; i < agents.size() && time < graph.getDeadline(); i++) {
+        while(time < getDeadline()) {
+            for (int i = 0; i < agents.size() && time < getDeadline(); i++) {
                 Agent agent = agents.get(i);
                 Move move  = agent.makeOperation();
                 System.out.println("Agent " + (i+1) + "'s turn:");
@@ -55,7 +58,7 @@ public class Simulator {
         else {
             double tempTime =
                     time + move.getEdge().getWeight() * (1 + kFactor * move.getAgent().getCarrying());
-            if (!(tempTime > graph.getDeadline())) {
+            if (!(tempTime > getDeadline())) {
                 /*If deadline isn't breached*/
                 move.getAgent().traverse(move.getTarget());
                 time = tempTime;
@@ -78,10 +81,11 @@ public class Simulator {
 
             System.out.println
                     ("Please enter the type of agent " + (i + 1) +
-                            ". Type 'h' for human, 'g' for greedy or" +
-                            " 'v' for vandal: ");
+                            ".\nType 'h' for human, 'g' for greedy," +
+                            " 'v' for vandal,\n's' for greedy best-first," +
+                            " 'a' for A* or 'r' for RTA*:");
             String agentType = sc.next();
-            while (!agentType.matches("[h|g|v]")) {
+            while (!agentType.matches("[h|g|v|s|a|r]")) {
                 System.out.println("Invalid option.");
                 agentType = sc.next();
             }
@@ -98,6 +102,16 @@ public class Simulator {
                 }
                 case "v": {
                     agents.add(new VandalAgent(i + 1));
+                    break;
+                }
+                case "s":{
+                    agents.add(new GreedyBestFirstAgent(i + 1));
+                    break;
+                }
+                case "a":{
+                    break;
+                }
+                case "r":{
                     break;
                 }
             }
@@ -174,5 +188,37 @@ public class Simulator {
         System.out.println("Time: " + time);
         System.out.println();
 
+    }
+
+    static int getDeadline() {
+        return deadline;
+    }
+
+    static void setDeadline(int deadline) {
+        Simulator.deadline = deadline;
+    }
+
+    static float getKFactor() {
+        return kFactor;
+    }
+
+    static int getSafeCount() {
+        return safeCount;
+    }
+
+    static void setSafeCount(int safeCount) {
+        Simulator.safeCount = safeCount;
+    }
+
+    static Graph getGraph() {
+        return graph;
+    }
+
+    static int getTotalPeople() {
+        return totalPeople;
+    }
+
+    static void increaseTotalPeople(int people) {
+        Simulator.totalPeople += people;
     }
 }

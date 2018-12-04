@@ -14,7 +14,7 @@ class VandalAgent extends Agent {
 
         Move move;
 
-        if (vandalCounter == Simulator.graph.getNumberOfVertices()){
+        if (vandalCounter == Simulator.getGraph().getNumberOfVertices()){
             /* Blocks an edge */
             Edge minimalEdge = getMinEdge();
 
@@ -26,7 +26,7 @@ class VandalAgent extends Agent {
 
             move = new Move(this, this.getLocation(), null);
         }
-        else if (vandalCounter == 2 * Simulator.graph.getNumberOfVertices() + 1){
+        else if (vandalCounter == 2 * Simulator.getGraph().getNumberOfVertices() + 1){
             /* Traverse */
 
             Edge minimalEdge = getMinEdge();

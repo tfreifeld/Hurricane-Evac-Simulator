@@ -81,7 +81,7 @@ abstract class Search {
 abstract class Node implements Comparable<Node> {
 
     private Vertex location;
-    private int pathCost;
+    float pathCost;
     private Node parent;
     private Node chosenChild;
 
@@ -93,9 +93,8 @@ abstract class Node implements Comparable<Node> {
         this.chosenChild = null;
     }
 
-    Node(Vertex location, Node parent, Edge edge) {
+    Node(Vertex location, Node parent) {
         this.location = location;
-        this.pathCost = parent.getPathCost() + edge.getWeight();
         this.parent = parent;
 
     }
@@ -108,7 +107,7 @@ abstract class Node implements Comparable<Node> {
         return location;
     }
 
-    int getPathCost() {
+    float getPathCost() {
         return pathCost;
     }
 
