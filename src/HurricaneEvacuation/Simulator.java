@@ -27,7 +27,9 @@ public class Simulator {
         while(time < graph.getDeadline()) {
             for (int i = 0; i < agents.size() && time < graph.getDeadline(); i++) {
                 Agent agent = agents.get(i);
-                makeMove(agent.makeOperation());
+                Move move  = agent.makeOperation();
+                System.out.println("Agent " + (i+1) + "'s turn:");
+                makeMove(move);
                 displayWorldState();
             }
         }
@@ -148,13 +150,19 @@ public class Simulator {
 
     private static void displayWorldState(){
 
+        System.out.println("Graph State:");
+        System.out.println("----------------");
         graph.displayGraphState();
+
+        System.out.println("Agents State:");
+        System.out.println("----------------");
 
         for (Agent agent:agents) {
             System.out.println("Agent " + agent.getAgentNum() + ":");
             System.out.println(agent.toString());
             System.out.println();
         }
+        System.out.println("----------------");
 
         if (safeCount == 1){
             System.out.println(safeCount + " person is safe");

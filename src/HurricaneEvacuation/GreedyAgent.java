@@ -1,6 +1,5 @@
 package HurricaneEvacuation;
 
-import java.util.*;
 import java.util.function.Predicate;
 
 class GreedyAgent extends Agent {
@@ -30,12 +29,7 @@ class GreedyAgent extends Agent {
             } else {
                 this.path = new UniformSearch(getLocation(), node -> node.getLocation().getPersons() > 0).run();
                 if (this.path != null){
-                    this.path.getLocation().registerListener(new OnPeopleChangeListener() {
-                        @Override
-                        public void onPeopleChange() {
-                            path = null;
-                        }
-                    });
+                    this.path.getLocation().registerListener(() -> path = null);
                 }
             }
 
@@ -73,141 +67,41 @@ class GreedyAgent extends Agent {
         return "{Type: Greedy\n" + super.toString();
     }
 
-    class UniformSearch {
-
-        Node node;
-        HashSet<Node> explored;
-        PriorityQueue<Node> fringe;
-        Predicate<Node> goalTest;
+    static class UniformSearch extends Search {
 
         UniformSearch(Vertex location, Predicate<Node> goalTest) {
-            this.explored = new HashSet<>();
-            this.node = new Node(location);
-            this.fringe = new PriorityQueue<>();
+            super(goalTest);
+            this.node = new UniformSearchNode(location);
             this.fringe.add(this.node);
-            this.goalTest = goalTest;
-        }
-
-        Node run() {
-
-            while (true) {
-
-                if (fringe.isEmpty()) {
-                    return null;
-                }
-
-                node = fringe.poll();
-
-                if (goalTest.test(node)) {
-                    return node;
-                }
-
-                explored.add(node);
-
-                for (Map.Entry<Integer, Edge> next : node.getLocation().getEdges().entrySet()) {
-
-                    if (next.getValue().isBlocked()){
-                        continue;
-                    }
-
-                    Node child = new Node
-                            (next.getValue().getNeighbour(node.getLocation()), node, next.getValue());
-
-                    boolean inFringe = false;
-
-                    for (Node node : fringe) {
-
-                        if (node.getLocation().equals(child.getLocation())) {
-
-                            inFringe = true;
-
-                            if (node.compareTo(child) > 0) {
-                                fringe.remove(node);
-                                fringe.add(child);
-                                break;
-                            }
-                        }
-                    }
-                    if (!inFringe) {
-
-                        boolean inExplored = false;
-
-                        for (Node node : explored) {
-                            if (node.getLocation().equals(child.getLocation())) {
-                                inExplored = true;
-                                break;
-                            }
-                        }
-
-                        if (!inExplored) {
-                            fringe.add(child);
-                        }
-                    }
-                }
-            }
-        }
-
-    }
-
-    class Node implements Comparable {
-
-        Vertex location;
-        int pathCost;
-        Node parent;
-        Node chosenChild;
-
-
-        Node(Vertex location) {
-            this.location = location;
-            this.pathCost = 0;
-            this.parent = null;
-            this.chosenChild = null;
-        }
-
-        Node(Vertex location, Node parent, Edge edge) {
-            this.location = location;
-            this.pathCost = parent.getPathCost() + edge.getWeight();
-            this.parent = parent;
-            /*if (this.parent.getChosenChild() == null) {
-                this.parent.setChosenChild(this);
-            }
-            else {
-                if (this.parent.getChosenChild().getPathCost() > this.getPathCost()){
-                    this.parent.setChosenChild(this);
-                }
-            }*/
-        }
-
-        private void setChosenChild(Node node) {
-            this.chosenChild = node;
-        }
-
-        Vertex getLocation() {
-            return location;
-        }
-
-        int getPathCost() {
-            return pathCost;
-        }
-
-        Node getParent() {
-            return parent;
-        }
-
-        Node getChosenChild() {
-            return chosenChild;
         }
 
         @Override
-        public int compareTo(Object o) {
-            int result =  Integer.compare(this.getPathCost(), ((Node) o).getPathCost());
-            if (result  == 0){
-                /*If nodes have the same path cost, compare according to number of people */
-                return Integer.compare(((Node)o).getLocation().getPersons(), this.getLocation().getPersons());
-            }
-            else{
+        Node getChildNode(Edge edge) {
+            return new UniformSearchNode(edge.getNeighbour(node.getLocation()), node, edge);
+        }
+    }
+
+    static class UniformSearchNode extends Node {
+
+        UniformSearchNode(Vertex location) {
+            super(location);
+        }
+
+        UniformSearchNode(Vertex location, Node parent, Edge edge) {
+            super(location, parent, edge);
+        }
+
+        @Override
+        public int compareTo(Node o) {
+
+            int result = Integer.compare(this.getPathCost(), o.getPathCost());
+            if (result == 0) {
+                /* If nodes have the same path cost, compare according to number of people */
+                return Integer.compare(o.getLocation().getPersons(), this.getLocation().getPersons());
+            } else {
                 return result;
             }
+
         }
     }
 }
