@@ -18,7 +18,7 @@ class GreedyAgent extends Agent {
         //TODO: add support for edges that become block along the run
 
         if (this.path != null) {
-            if (this.path.getLocation().equals(this.getLocation())) {
+            if (this.path.getState().getLocation().equals(this.getLocation())) {
                 /*If target has been reached, need to choose new target */
                 this.path = null;
             }
@@ -27,11 +27,11 @@ class GreedyAgent extends Agent {
         if (this.path == null) {
             /*If a target has not yet been set */
             if (getCarrying() > 0) {
-                this.path = new UniformSearch(getLocation(), node -> node.getLocation().isShelter()).run();
+                this.path = new UniformSearch(getLocation(), node -> node.getState().getLocation().isShelter()).run();
             } else {
-                this.path = new UniformSearch(getLocation(), node -> node.getLocation().getPersons() > 0).run();
+                this.path = new UniformSearch(getLocation(), node -> node.getState().getLocation().getPersons() > 0).run();
                 if (this.path != null){
-                    this.path.getLocation().registerListener(() -> path = null);
+                    this.path.getState().getLocation().registerListener(() -> path = null);
                 }
             }
 
@@ -40,7 +40,7 @@ class GreedyAgent extends Agent {
                 return new Move(this, this.getLocation(),null);
             }
 
-            while (!this.path.getParent().getLocation().equals(this.getLocation())) {
+            while (!this.path.getParent().getState().getLocation().equals(this.getLocation())) {
                 this.path.getParent().setChosenChild(this.path);
                 this.path = this.path.getParent();
             }
@@ -49,14 +49,14 @@ class GreedyAgent extends Agent {
         Edge edge;
 
         try {
-            edge = this.getLocation().getNeighbour(this.path.getLocation().getId());
+            edge = this.getLocation().getNeighbour(this.path.getState().getLocation().getId());
         } catch (Vertex.NotNeighbourException e) {
             e.printStackTrace();
             this.path = null;
             return new Move(this, this.getLocation(), null);
         }
 
-        Move move = new Move(this, this.path.getLocation(), edge);
+        Move move = new Move(this, this.path.getState().getLocation(), edge);
 
         this.path = this.path.getChosenChild();
 
@@ -78,20 +78,24 @@ class GreedyAgent extends Agent {
         }
 
         @Override
-        Node getChildNode(Edge edge) {
-            return new UniformSearchNode(edge.getNeighbour(node.getLocation()), (UniformSearchNode) node, edge);
+        Node createChildNode(Edge edge) {
+            return new UniformSearchNode(edge.getNeighbour
+                    (node.getState().getLocation()), (UniformSearchNode) node, edge);
         }
+
     }
 
     static private class UniformSearchNode extends Node {
 
         UniformSearchNode(Vertex location) {
-            super(location);
+            super();
+            this.state = new State(null, location, -1);
         }
 
         UniformSearchNode(Vertex location, UniformSearchNode parent, Edge edge) {
-            super(location, parent);
+            super(parent);
             this.pathCost = parent.getPathCost() + edge.getWeight();
+            this.state = new State(null, location, -1);
 
         }
 
@@ -101,7 +105,8 @@ class GreedyAgent extends Agent {
             int result = Float.compare(this.getPathCost(), o.getPathCost());
             if (result == 0) {
                 /* If nodes have the same path cost, compare according to number of people */
-                return Integer.compare(o.getLocation().getPersons(), this.getLocation().getPersons());
+                return Integer.compare(o.getState().getLocation().getPersons(),
+                                        this.getState().getLocation().getPersons());
             } else {
                 return result;
             }

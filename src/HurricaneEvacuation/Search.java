@@ -1,20 +1,19 @@
 package HurricaneEvacuation;
 
-import java.util.HashSet;
-import java.util.PriorityQueue;
+import java.util.*;
 import java.util.function.Predicate;
 
 abstract class Search {
 
     Node node;
-    private HashSet<Node> explored;
     PriorityQueue<Node> fringe;
     private Predicate<Node> goalTest;
+    private HashMap<State, Node> explored;
 
     Search(Predicate<Node> goalTest) {
-        this.explored = new HashSet<>();
         this.fringe = new PriorityQueue<>();
         this.goalTest = goalTest;
+        this.explored = new HashMap<>();
     }
 
     Node run() {
@@ -31,21 +30,21 @@ abstract class Search {
                 return node;
             }
 
-            explored.add(node);
+            putInExplored(node);
 
-            for (Edge next : node.getLocation().getEdges().values()) {
+            for (Edge next : node.getState().getLocation().getEdges().values()) {
 
                 if (next.isBlocked()) {
                     continue;
                 }
 
-                Node child = getChildNode(next);
+                Node child = createChildNode(next);
 
                 boolean inFringe = false;
 
                 for (Node node : fringe) {
 
-                    if (node.getLocation().equals(child.getLocation())) {
+                    if (node.getState().equals(child.state)/*node.getLocation().equals(child.getLocation())*/) {
 
                         inFringe = true;
 
@@ -57,17 +56,7 @@ abstract class Search {
                     }
                 }
                 if (!inFringe) {
-
-                    boolean inExplored = false;
-
-                    for (Node node : explored) {
-                        if (node.getLocation().equals(child.getLocation())) {
-                            inExplored = true;
-                            break;
-                        }
-                    }
-
-                    if (!inExplored) {
+                    if (!exploredTest(child)) {
                         fringe.add(child);
                     }
                 }
@@ -75,36 +64,43 @@ abstract class Search {
         }
     }
 
-    abstract Node getChildNode(Edge edge);
+    private void putInExplored(Node node) {
+        explored.put(node.getState(), node);
+    }
+
+    private boolean exploredTest(Node node) {
+        return explored.containsKey(node.getState());
+    }
+
+    abstract Node createChildNode(Edge edge);
 }
 
 abstract class Node implements Comparable<Node> {
 
-    private Vertex location;
     float pathCost;
     private Node parent;
+    private ArrayList<Node> children;
     private Node chosenChild;
+    State state;
 
 
-    Node(Vertex location) {
-        this.location = location;
+    Node() {
+
         this.pathCost = 0;
+        this.children = new ArrayList<>();
         this.parent = null;
         this.chosenChild = null;
     }
 
-    Node(Vertex location, Node parent) {
-        this.location = location;
+    Node(Node parent) {
         this.parent = parent;
+        this.parent.getChildren().add(this);
+        this.children = new ArrayList<>();
 
     }
 
     void setChosenChild(Node node) {
         this.chosenChild = node;
-    }
-
-    Vertex getLocation() {
-        return location;
     }
 
     float getPathCost() {
@@ -119,7 +115,59 @@ abstract class Node implements Comparable<Node> {
         return chosenChild;
     }
 
+    private ArrayList<Node> getChildren() {
+        return children;
+    }
+
+    State getState() {
+        return state;
+    }
+
     @Override
     abstract public int compareTo(Node o);
+}
+
+class State {
+
+    final private HashMap<Integer, Integer> peopleMap; /* Null if irrelevant */
+    final private int leftToSave; /* -1 if irrelevant */
+    final private Vertex location;
+
+    State(HashMap<Integer, Integer> peopleMap, Vertex location, int leftToSave) {
+        this.peopleMap = peopleMap;
+        this.location = location;
+        this.leftToSave = leftToSave;
+    }
+
+    HashMap<Integer, Integer> getPeopleMap() {
+        return peopleMap;
+    }
+
+    Vertex getLocation() {
+        return location;
+    }
+
+    int getLeftToSave() {
+        return leftToSave;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof State)) {
+            return false;
+        } else {
+            return ((this.getPeopleMap() == null && ((State) obj).getPeopleMap() == null)
+                    || (this.getPeopleMap().equals(((State) obj).getPeopleMap())))
+                    && (this.getLocation().equals(((State) obj).getLocation()))
+                    && (this.getLeftToSave() == ((State) obj).getLeftToSave());
+
+        }
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(peopleMap, leftToSave, location);
+    }
 }
 

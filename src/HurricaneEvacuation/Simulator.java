@@ -1,9 +1,7 @@
 package HurricaneEvacuation;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.util.*;
 
 public class Simulator {
 
@@ -220,5 +218,15 @@ public class Simulator {
 
     static void increaseTotalPeople(int people) {
         Simulator.totalPeople += people;
+    }
+
+    static HashMap<Integer, Integer> getInitialPeopleMap() {
+        HashMap<Integer, Integer> peopleMap = new HashMap<>();
+        for (Map.Entry<Integer, Vertex> v : getGraph().getVertices().entrySet()) {
+            if (v.getValue().getPersons() > 0) {
+                peopleMap.put(v.getKey(), v.getValue().getPersons());
+            }
+        }
+        return peopleMap;
     }
 }

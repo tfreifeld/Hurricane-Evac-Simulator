@@ -139,6 +139,10 @@ class Graph {
 
     }
 
+    HashMap<Integer, Vertex> getVertices() {
+        return vertices;
+    }
+
     Vertex getVertex(int index){
         return vertices.get(index);
     }

@@ -1,6 +1,6 @@
 package HurricaneEvacuation;
 
-import java.util.function.Predicate;
+import java.util.HashMap;
 
 class GreedyBestFirstAgent extends Agent {
 
@@ -17,8 +17,7 @@ class GreedyBestFirstAgent extends Agent {
 
 
         if (this.searchTree == null){
-            this.searchTree = new GreedyBestFirstSearch(this.getLocation(),
-                    node -> node.getPathCost() > Simulator.getDeadline()).run();
+            this.searchTree = new GreedyBestFirstSearch(this.getLocation()).run();
         }
         else{
 
@@ -35,55 +34,78 @@ class GreedyBestFirstAgent extends Agent {
 
         try {
             edge = this.getLocation()
-                    .getNeighbour(this.searchTree.getLocation().getId());
+                    .getNeighbour(this.searchTree.getState().getLocation().getId());
         } catch (Vertex.NotNeighbourException e) {
             e.printStackTrace();
             this.searchTree = null;
             return new Move(this, this.getLocation(), null);
         }
-        Move move = new Move(this, searchTree.getLocation(), edge);
+        Move move = new Move(this, searchTree.getState().getLocation(), edge);
         return move;
     }
 
     static private class GreedyBestFirstSearch extends Search{
 
-        GreedyBestFirstSearch(Vertex location, Predicate<Node> goalTest) {
-            super(goalTest);
+        GreedyBestFirstSearch(Vertex location) {
+            super(node -> node.getPathCost() > Simulator.getDeadline());
             this.node = new GreedyBestFirstNode(location);
             this.fringe.add(this.node);
         }
 
         @Override
-        Node getChildNode(Edge edge) {
+        Node createChildNode(Edge edge) {
             return new GreedyBestFirstNode
-                    (edge.getNeighbour(node.getLocation()), (GreedyBestFirstNode) node, edge);
+                    (edge.getNeighbour(node.getState().getLocation()), (GreedyBestFirstNode) node, edge);
 
         }
     }
 
     static private class GreedyBestFirstNode extends Node{
 
-        private int leftToSave;
+        private int carrying;
 
         GreedyBestFirstNode(Vertex location) {
-            super(location);
-            this.leftToSave = Simulator.getTotalPeople();
+            super();
+
+            this.carrying = 0;
+
+            this.state = new State(Simulator.getInitialPeopleMap(), location, Simulator.getTotalPeople());
         }
 
         GreedyBestFirstNode(Vertex location, GreedyBestFirstNode parent, Edge edge) {
-            super(location, parent);
+            super(parent);
+
             this.pathCost = parent.getPathCost()
-                    + edge.getWeight() * (1 + Simulator.getKFactor());
-            this.leftToSave = parent.getLeftToSave() - location.getPersons();
+                    + edge.getWeight() * (1 + Simulator.getKFactor() /*TODO: need to multiply in vehicle load*/);
+
+            this.carrying = parent.getCarrying();
+
+            HashMap<Integer,Integer> tempPeopleMap = new HashMap<>(parent.getState().getPeopleMap());
+            int tempLeftToSave = parent.getState().getLeftToSave();
+
+            if(location.getPersons() > 0){
+                this.carrying += location.getPersons();
+                tempPeopleMap.replace(location.getId(), 0);
+            }
+
+            if(location.isShelter()){
+                tempLeftToSave -= this.carrying;
+                this.carrying = 0;
+            }
+
+            this.state = new State(tempPeopleMap,location, tempLeftToSave);
         }
 
-        int getLeftToSave() {
-            return leftToSave;
+        int getCarrying() {
+            return carrying;
         }
 
         @Override
         public int compareTo(Node o) {
-            return Integer.compare(this.getLeftToSave(), ((GreedyBestFirstNode)o).getLeftToSave());
+//            return Integer.compare(this.getLeftToSave(), ((GreedyBestFirstNode)o).getLeftToSave());
+
+            /*TODO*/
+            return 0;
         }
     }
 }
