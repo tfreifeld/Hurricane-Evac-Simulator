@@ -5,7 +5,6 @@ import java.util.function.Predicate;
 
 abstract class Search {
 
-    Node node;
     PriorityQueue<Node> fringe;
     private Predicate<Node> goalTest;
     private HashMap<State, Node> explored;
@@ -24,21 +23,21 @@ abstract class Search {
                 return null;
             }
 
-            node = fringe.poll();
+            Node currentNode = fringe.poll();
 
-            if (goalTest.test(node)) {
-                return node;
+            if (goalTest.test(currentNode)) {
+                return currentNode;
             }
 
-            putInExplored(node);
+            putInExplored(currentNode);
 
-            for (Edge next : node.getState().getLocation().getEdges().values()) {
+            for (Edge nextEdge : currentNode.getState().getLocation().getEdges().values()) {
 
-                if (next.isBlocked()) {
+                if (nextEdge.isBlocked()) {
                     continue;
                 }
 
-                Node child = createChildNode(next);
+                Node child = createChildNode(nextEdge, currentNode);
 
                 boolean inFringe = false;
 
@@ -72,7 +71,7 @@ abstract class Search {
         return explored.containsKey(node.getState());
     }
 
-    abstract Node createChildNode(Edge edge);
+    abstract Node createChildNode(Edge edge, Node currentNode);
 }
 
 abstract class Node implements Comparable<Node> {

@@ -3,39 +3,36 @@ package HurricaneEvacuation;
 import java.util.HashMap;
 import java.util.Map;
 
-class GreedyBestFirstAgent extends Agent {
+abstract class SearchAgent extends Agent {
 
     private Node node;
 
-    GreedyBestFirstAgent(int agentNum) {
+    SearchAgent(int agentNum) {
 
         this.agentNum = agentNum;
         this.node = null;
     }
 
+    abstract HeuristicSearch getSearch(Vertex location);
+
     @Override
     Move makeOperation() {
-
 
         if (this.node == null){
 
             State currentState = new State(Simulator.getInitialPeopleMap(), location, Simulator.getTotalPeople());
 
-            this.node = new GreedyBestFirstSearch(this.getLocation()).run();
+            this.node = getSearch(this.getLocation()).run();
+
+            if (this.node == null){
+                /*If no path has been found -> NoOp*/
+                return new Move(this, this.getLocation(),null);
+            }
+
             while (!(this.node.getParent().getState().equals(currentState))){
                 this.node.getParent().setChosenChild(this.node);
                 this.node = this.node.getParent();
             }
-        }
-        else{
-
-            this.node = node.getChosenChild();
-
-        }
-
-        if (this.node == null){
-            /*If no path has been found -> NoOp*/
-            return new Move(this, this.getLocation(),null);
         }
 
         Edge edge;
@@ -55,28 +52,19 @@ class GreedyBestFirstAgent extends Agent {
         return move;
     }
 
-    static private class GreedyBestFirstSearch extends Search{
+    static abstract class HeuristicSearch extends Search{
 
-        GreedyBestFirstSearch(Vertex location) {
+        HeuristicSearch() {
             super(node -> node.getPathCost() > Simulator.getDeadline());
-            this.node = new GreedyBestFirstNode(location);
-            this.fringe.add(this.node);
-        }
-
-        @Override
-        Node createChildNode(Edge edge) {
-            return new GreedyBestFirstNode
-                    (edge.getNeighbour(node.getState().getLocation()), (GreedyBestFirstNode) node, edge);
-
         }
     }
 
-    static private class GreedyBestFirstNode extends Node{
+    static abstract class HeuristicNode extends Node{
 
         private int carrying;
-        private int heuristicValue;
+        private double heuristicValue;
 
-        GreedyBestFirstNode(Vertex location) {
+        HeuristicNode(Vertex location) {
             super();
 
             this.carrying = 0;
@@ -85,7 +73,7 @@ class GreedyBestFirstAgent extends Agent {
             this.heuristicValue = computeEvaluationFunction();
         }
 
-        GreedyBestFirstNode(Vertex location, GreedyBestFirstNode parent, Edge edge) {
+        HeuristicNode(Vertex location, HeuristicNode parent, Edge edge) {
             super(parent);
 
             this.pathCost = parent.getPathCost()
@@ -114,7 +102,7 @@ class GreedyBestFirstAgent extends Agent {
             return carrying;
         }
 
-        int computeEvaluationFunction(){
+        double computeEvaluationFunction() {
 
             int result = 0;
 
@@ -137,7 +125,7 @@ class GreedyBestFirstAgent extends Agent {
 
         @Override
         public int compareTo(Node o) {
-            return Integer.compare(this.heuristicValue, ((GreedyBestFirstNode)o).heuristicValue);
+            return Double.compare(this.heuristicValue, ((HeuristicNode)o).heuristicValue);
 
         }
     }

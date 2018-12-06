@@ -69,18 +69,17 @@ class GreedyAgent extends Agent {
         return "{Type: Greedy\n" + super.toString();
     }
 
-    static  class UniformSearch extends Search {
+    static class UniformSearch extends Search {
 
         UniformSearch(Vertex location, Predicate<Node> goalTest) {
             super(goalTest);
-            this.node = new UniformSearchNode(location);
-            this.fringe.add(this.node);
+            this.fringe.add(new UniformSearchNode(location));
         }
 
         @Override
-        Node createChildNode(Edge edge) {
+        Node createChildNode(Edge edge, Node currentNode) {
             return new UniformSearchNode(edge.getNeighbour
-                    (node.getState().getLocation()), (UniformSearchNode) node, edge);
+                    (currentNode.getState().getLocation()), (UniformSearchNode) currentNode, edge);
         }
 
     }

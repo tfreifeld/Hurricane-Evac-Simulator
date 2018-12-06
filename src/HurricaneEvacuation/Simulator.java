@@ -105,10 +105,11 @@ public class Simulator {
                     break;
                 }
                 case "s":{
-                    agents.add(new GreedyBestFirstAgent(i + 1));
+                    agents.add(new GreedySearchAgent(i + 1));
                     break;
                 }
                 case "a":{
+                    agents.add(new AStarSearchAgent(i + 1));
                     break;
                 }
                 case "r":{
@@ -166,7 +167,7 @@ public class Simulator {
 
         System.out.println("Graph State:");
         System.out.println("----------------");
-        graph.displayGraphState();
+        //graph.displayGraphState();
 
         System.out.println("Agents State:");
         System.out.println("----------------");
