@@ -23,7 +23,9 @@ public class Simulator {
         graph.constructGraph();
 
         readInputFromUser();
-
+        for (int i = 1; i <= graph.getNumberOfVertices(); i++) {
+            graph.getVertex(i).runLengthsSearch();
+        }
 
         while(time < getDeadline()) {
             for (int i = 0; i < agents.size() && time < getDeadline(); i++) {

@@ -44,7 +44,7 @@ abstract class Search {
 
                 for (Node node : fringe) {
 
-                    if (node.getState().equals(child.state)/*node.getLocation().equals(child.getLocation())*/) {
+                    if (node.getState().equals(child.state)) {
 
                         inFringe = true;
 

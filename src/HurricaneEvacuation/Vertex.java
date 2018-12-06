@@ -1,9 +1,6 @@
 package HurricaneEvacuation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 class Vertex {
 
@@ -12,6 +9,8 @@ class Vertex {
     private boolean shelter;
     private HashMap<Integer,Edge> edges;
     private ArrayList<OnPeopleChangeListener> mListeners;
+    private HashMap<Integer,Double> lengthsToPeople;
+    private double lengthToClosestShelter;
 
     Vertex(int id) {
         this.id = id;
@@ -19,6 +18,9 @@ class Vertex {
         this.shelter = false;
         this.edges = new HashMap<>();
         this.mListeners = new ArrayList<>();
+        this.lengthsToPeople = new HashMap<>();
+        this.lengthToClosestShelter = Double.POSITIVE_INFINITY;
+
     }
 
     void submitEdge(Edge edge){
@@ -92,6 +94,30 @@ class Vertex {
 
         ans.append("]");
         return ans.toString();
+    }
+
+    void runLengthsSearch(){
+
+        HashMap<Integer, Integer> peopleMap = Simulator.getInitialPeopleMap();
+        for (Map.Entry<Integer, Integer> next : peopleMap.entrySet()) {
+            int targetVertex = next.getKey();
+            double length = new GreedyAgent.UniformSearch(this,
+                    node -> node.getState().getLocation().getId() == targetVertex)
+                    .run().getPathCost();
+            lengthsToPeople.put(targetVertex, length);
+        }
+        this.lengthToClosestShelter = new GreedyAgent.UniformSearch(
+                this, node -> node.getState().getLocation().isShelter())
+                .run().getPathCost();
+
+    }
+
+    double getLengthToClosestShelter() {
+        return lengthToClosestShelter;
+    }
+
+    HashMap<Integer, Double> getLengthsToPeople() {
+        return lengthsToPeople;
     }
 
     void registerListener(OnPeopleChangeListener listener){

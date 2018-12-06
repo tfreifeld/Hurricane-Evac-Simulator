@@ -69,7 +69,7 @@ class GreedyAgent extends Agent {
         return "{Type: Greedy\n" + super.toString();
     }
 
-    static private class UniformSearch extends Search {
+    static  class UniformSearch extends Search {
 
         UniformSearch(Vertex location, Predicate<Node> goalTest) {
             super(goalTest);

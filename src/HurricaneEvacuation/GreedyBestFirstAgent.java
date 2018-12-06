@@ -1,31 +1,39 @@
 package HurricaneEvacuation;
 
 import java.util.HashMap;
+import java.util.Map;
 
 class GreedyBestFirstAgent extends Agent {
 
-    private Node searchTree;
+    private Node node;
 
     GreedyBestFirstAgent(int agentNum) {
 
         this.agentNum = agentNum;
-        this.searchTree = null;
+        this.node = null;
     }
 
     @Override
     Move makeOperation() {
 
 
-        if (this.searchTree == null){
-            this.searchTree = new GreedyBestFirstSearch(this.getLocation()).run();
+        if (this.node == null){
+
+            State currentState = new State(Simulator.getInitialPeopleMap(), location, Simulator.getTotalPeople());
+
+            this.node = new GreedyBestFirstSearch(this.getLocation()).run();
+            while (!(this.node.getParent().getState().equals(currentState))){
+                this.node.getParent().setChosenChild(this.node);
+                this.node = this.node.getParent();
+            }
         }
         else{
 
-            this.searchTree = searchTree.getChosenChild();
+            this.node = node.getChosenChild();
 
         }
 
-        if (this.searchTree == null){
+        if (this.node == null){
             /*If no path has been found -> NoOp*/
             return new Move(this, this.getLocation(),null);
         }
@@ -34,13 +42,16 @@ class GreedyBestFirstAgent extends Agent {
 
         try {
             edge = this.getLocation()
-                    .getNeighbour(this.searchTree.getState().getLocation().getId());
+                    .getNeighbour(this.node.getState().getLocation().getId());
         } catch (Vertex.NotNeighbourException e) {
             e.printStackTrace();
-            this.searchTree = null;
+            this.node = null;
             return new Move(this, this.getLocation(), null);
         }
-        Move move = new Move(this, searchTree.getState().getLocation(), edge);
+        Move move = new Move(this, this.node.getState().getLocation(), edge);
+
+        this.node = this.node.getChosenChild();
+
         return move;
     }
 
@@ -63,6 +74,7 @@ class GreedyBestFirstAgent extends Agent {
     static private class GreedyBestFirstNode extends Node{
 
         private int carrying;
+        private int heuristicValue;
 
         GreedyBestFirstNode(Vertex location) {
             super();
@@ -70,6 +82,7 @@ class GreedyBestFirstAgent extends Agent {
             this.carrying = 0;
 
             this.state = new State(Simulator.getInitialPeopleMap(), location, Simulator.getTotalPeople());
+            this.heuristicValue = computeEvaluationFunction();
         }
 
         GreedyBestFirstNode(Vertex location, GreedyBestFirstNode parent, Edge edge) {
@@ -94,18 +107,38 @@ class GreedyBestFirstAgent extends Agent {
             }
 
             this.state = new State(tempPeopleMap,location, tempLeftToSave);
+            this.heuristicValue = computeEvaluationFunction();
         }
 
         int getCarrying() {
             return carrying;
         }
 
+        int computeEvaluationFunction(){
+
+            int result = 0;
+
+            /*TODO: consider adding a condition if this a goal test then return zero*/
+
+            HashMap<Integer,Double> lengthsToPeople = getState().getLocation().getLengthsToPeople();
+            for (Map.Entry<Integer,Integer> entry: getState().getPeopleMap().entrySet()){
+                if (entry.getValue() > 0){
+                    double lengthToShelter =
+                            Simulator.getGraph().getVertex(entry.getKey()).getLengthToClosestShelter();
+                    if (getPathCost() + lengthsToPeople.get(entry.getKey())
+                            + lengthToShelter > Simulator.getDeadline()){
+                        result += entry.getValue() * 100;
+                    }
+                }
+            }
+
+            return result;
+        }
+
         @Override
         public int compareTo(Node o) {
-//            return Integer.compare(this.getLeftToSave(), ((GreedyBestFirstNode)o).getLeftToSave());
+            return Integer.compare(this.heuristicValue, ((GreedyBestFirstNode)o).heuristicValue);
 
-            /*TODO*/
-            return 0;
         }
     }
 }
