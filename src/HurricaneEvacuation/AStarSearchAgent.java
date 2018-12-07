@@ -38,7 +38,7 @@ class AStarSearchAgent extends SearchAgent {
 
         @Override
         double computeEvaluationFunction() {
-            return super.computeEvaluationFunction() + this.getPathCost();
+            return super.computeHeuristicFunction() + this.getPathCost();
         }
     }
 }

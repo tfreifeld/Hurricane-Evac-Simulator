@@ -19,7 +19,7 @@ class VandalAgent extends Agent {
             Edge minimalEdge = getMinEdge();
 
             if (minimalEdge != null) {
-                minimalEdge.setBlocked(true);
+                minimalEdge.setBlocked();
             }
 
             vandalCounter++;

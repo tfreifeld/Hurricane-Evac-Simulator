@@ -18,18 +18,19 @@ abstract class SearchAgent extends Agent {
     @Override
     Move makeOperation() {
 
-        if (this.node == null){
+        if (this.node == null) {
 
-            State currentState = new State(Simulator.getInitialPeopleMap(), location, Simulator.getTotalPeople());
+            State currentState =
+                    new State(Simulator.getInitialPeopleMap(), location, Simulator.getTotalPeople());
 
             this.node = getSearch(this.getLocation()).run();
 
-            if (this.node == null){
+            if (this.node == null) {
                 /*If no path has been found -> NoOp*/
-                return new Move(this, this.getLocation(),null);
+                return new Move(this, this.getLocation(), null);
             }
 
-            while (!(this.node.getParent().getState().equals(currentState))){
+            while (!(this.node.getParent().getState().equals(currentState))) {
                 this.node.getParent().setChosenChild(this.node);
                 this.node = this.node.getParent();
             }
@@ -52,17 +53,18 @@ abstract class SearchAgent extends Agent {
         return move;
     }
 
-    static abstract class HeuristicSearch extends Search{
+    static abstract class HeuristicSearch extends Search {
 
         HeuristicSearch() {
-            super(node -> node.getPathCost() > Simulator.getDeadline());
+            super(node -> (node.getPathCost() > Simulator.getDeadline()) ||
+                    (node.getState().getLeftToSave() == 0));
         }
     }
 
-    static abstract class HeuristicNode extends Node{
+    static abstract class HeuristicNode extends Node {
 
         private int carrying;
-        private double heuristicValue;
+        private double evaluationValue;
 
         HeuristicNode(Vertex location) {
             super();
@@ -70,53 +72,67 @@ abstract class SearchAgent extends Agent {
             this.carrying = 0;
 
             this.state = new State(Simulator.getInitialPeopleMap(), location, Simulator.getTotalPeople());
-            this.heuristicValue = computeEvaluationFunction();
+            this.evaluationValue = computeEvaluationFunction();
         }
 
         HeuristicNode(Vertex location, HeuristicNode parent, Edge edge) {
             super(parent);
 
-            this.pathCost = parent.getPathCost()
-                    + edge.getWeight() * (1 + Simulator.getKFactor() /*TODO: need to multiply in vehicle load*/);
 
+            HashMap<Integer, Integer> tempPeopleMap = new HashMap<>(parent.getState().getPeopleMap());
             this.carrying = parent.getCarrying();
 
-            HashMap<Integer,Integer> tempPeopleMap = new HashMap<>(parent.getState().getPeopleMap());
-            int tempLeftToSave = parent.getState().getLeftToSave();
+            this.pathCost = parent.getPathCost()
+                    + edge.getWeight() * (1 + Simulator.getKFactor() * this.carrying);
 
-            if(location.getPersons() > 0){
+            if (location.getPersons() > 0) {
                 this.carrying += location.getPersons();
                 tempPeopleMap.replace(location.getId(), 0);
             }
+            int tempLeftToSave = parent.getState().getLeftToSave();
 
-            if(location.isShelter()){
+            if (location.isShelter()) {
                 tempLeftToSave -= this.carrying;
                 this.carrying = 0;
             }
 
-            this.state = new State(tempPeopleMap,location, tempLeftToSave);
-            this.heuristicValue = computeEvaluationFunction();
+
+            this.state = new State(tempPeopleMap, location, tempLeftToSave);
+            this.evaluationValue = computeEvaluationFunction();
         }
 
         int getCarrying() {
             return carrying;
         }
 
-        double computeEvaluationFunction() {
+        abstract double computeEvaluationFunction();
+
+        double computeHeuristicFunction() {
 
             int result = 0;
 
             /*TODO: consider adding a condition if this a goal test then return zero*/
 
-            HashMap<Integer,Double> lengthsToPeople = getState().getLocation().getLengthsToPeople();
-            for (Map.Entry<Integer,Integer> entry: getState().getPeopleMap().entrySet()){
-                if (entry.getValue() > 0){
+            HashMap<Integer, Double> lengthsToPeopleMap = getState().getLocation().getLengthsToPeople();
+            for (Map.Entry<Integer, Integer> entry : getState().getPeopleMap().entrySet()) {
+                if (entry.getValue() > 0) {
                     double lengthToShelter =
-                            Simulator.getGraph().getVertex(entry.getKey()).getLengthToClosestShelter();
-                    if (getPathCost() + lengthsToPeople.get(entry.getKey())
-                            + lengthToShelter > Simulator.getDeadline()){
+                            Simulator.getGraph().getVertex(entry.getKey()).getLengthToClosestShelter()
+                                    * (1 + ((getCarrying() + entry.getValue()) * Simulator.getKFactor()));
+                    double lengthToPeople = (lengthsToPeopleMap.get(entry.getKey())
+                            * (1 + getCarrying() * Simulator.getKFactor()));
+                    if (getPathCost() + lengthToPeople + lengthToShelter > Simulator.getDeadline()) {
                         result += entry.getValue() * 100;
                     }
+                }
+            }
+
+            if (this.getCarrying() > 0) {
+                double lengthToShelter =
+                        Simulator.getGraph().getVertex(getState().getLocation().getId())
+                                .getLengthToClosestShelter() * (1 + (getCarrying() * Simulator.getKFactor()));
+                if (getPathCost() + lengthToShelter > Simulator.getDeadline()) {
+                    result += this.carrying * 100;
                 }
             }
 
@@ -125,7 +141,7 @@ abstract class SearchAgent extends Agent {
 
         @Override
         public int compareTo(Node o) {
-            return Double.compare(this.heuristicValue, ((HeuristicNode)o).heuristicValue);
+            return Double.compare(this.evaluationValue, ((HeuristicNode) o).evaluationValue);
 
         }
     }

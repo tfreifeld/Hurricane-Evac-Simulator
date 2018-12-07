@@ -36,5 +36,10 @@ class GreedySearchAgent extends SearchAgent {
             super(location, parent, edge);
         }
 
+        @Override
+        double computeEvaluationFunction() {
+            return super.computeHeuristicFunction();
+        }
+
     }
 }

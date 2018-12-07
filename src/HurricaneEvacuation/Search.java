@@ -130,12 +130,14 @@ class State {
 
     final private HashMap<Integer, Integer> peopleMap; /* Null if irrelevant */
     final private int leftToSave; /* -1 if irrelevant */
+//    final private int carrying; /* - 1 if irrelevant */
     final private Vertex location;
 
-    State(HashMap<Integer, Integer> peopleMap, Vertex location, int leftToSave) {
+    State(HashMap<Integer, Integer> peopleMap, Vertex location, int leftToSave/*, int carrying*/) {
         this.peopleMap = peopleMap;
         this.location = location;
         this.leftToSave = leftToSave;
+//        this.carrying = carrying;
     }
 
     HashMap<Integer, Integer> getPeopleMap() {
@@ -150,6 +152,10 @@ class State {
         return leftToSave;
     }
 
+  /*  int getCarrying() {
+        return carrying;
+    }*/
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof State)) {
@@ -159,6 +165,7 @@ class State {
                     || (this.getPeopleMap().equals(((State) obj).getPeopleMap())))
                     && (this.getLocation().equals(((State) obj).getLocation()))
                     && (this.getLeftToSave() == ((State) obj).getLeftToSave());
+                  //  && (this.getCarrying() == ((State) obj).getCarrying());
 
         }
     }
@@ -166,7 +173,7 @@ class State {
     @Override
     public int hashCode() {
 
-        return Objects.hash(peopleMap, leftToSave, location);
+        return Objects.hash(peopleMap, leftToSave, location/*, carrying*/);
     }
 }
 

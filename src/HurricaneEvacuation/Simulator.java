@@ -27,11 +27,13 @@ public class Simulator {
             graph.getVertex(i).runLengthsSearch();
         }
 
-        while(time < getDeadline()) {
+        getGraph().displayGraphState();
+
+        while (time < getDeadline()) {
             for (int i = 0; i < agents.size() && time < getDeadline(); i++) {
                 Agent agent = agents.get(i);
-                Move move  = agent.makeOperation();
-                System.out.println("Agent " + (i+1) + "'s turn:");
+                Move move = agent.makeOperation();
+                System.out.print("Agent " + (i + 1) + "'s turn: ");
                 makeMove(move);
                 displayWorldState();
             }
@@ -45,25 +47,27 @@ public class Simulator {
 
     }
 
-    private static void makeMove(Move move){
+    private static void makeMove(Move move) {
 
-        if (move.getEdge() == null){
+        if (move.getEdge() == null) {
             /*NoOp*/
+            System.out.println("NoOp");
             time++;
-        }
-        else if (move.getEdge().isBlocked()){
+        } else if (move.getEdge().isBlocked()) {
+            System.out.println("traverse failed - edge blocked");
             /*Edge is blocked*/
             time++;
-        }
-        else {
+        } else {
             double tempTime =
                     time + move.getEdge().getWeight() * (1 + kFactor * move.getAgent().getCarrying());
             if (!(tempTime > getDeadline())) {
                 /*If deadline isn't breached*/
+                System.out.println("traverse - " + move.getAgent().getLocation().getId()
+                        + " to " + move.getTarget().getId());
                 move.getAgent().traverse(move.getTarget());
                 time = tempTime;
-            }
-            else{
+            } else {
+                System.out.println("traverse failed - will breach deadline");
                 /*If deadline is breached, traverse fails*/
                 time++;
             }
@@ -104,15 +108,15 @@ public class Simulator {
                     agents.add(new VandalAgent(i + 1));
                     break;
                 }
-                case "s":{
+                case "s": {
                     agents.add(new GreedySearchAgent(i + 1));
                     break;
                 }
-                case "a":{
+                case "a": {
                     agents.add(new AStarSearchAgent(i + 1));
                     break;
                 }
-                case "r":{
+                case "r": {
                     break;
                 }
             }
@@ -122,16 +126,15 @@ public class Simulator {
                             " vertex for agent " + (i + 1) + ": ");
 
             int startVertex;
-            while(true){
+            while (true) {
 
                 try {
                     startVertex = sc.nextInt();
-                    if (startVertex > graph.getNumberOfVertices()){
+                    if (startVertex > graph.getNumberOfVertices()) {
                         System.out.println("There are only " + graph.getNumberOfVertices()
-                                        + " vertices.");
+                                + " vertices.");
                         continue;
-                    }
-                    else if (startVertex <= 0){
+                    } else if (startVertex <= 0) {
                         System.out.println("Invalid option.");
                         continue;
                     }
@@ -147,15 +150,15 @@ public class Simulator {
         }
 
         System.out.println("Please enter the \"slow-down\" constant: ");
-        while(true){
-            try{
+        while (true) {
+            try {
                 kFactor = sc.nextFloat();
-                if (kFactor < 0){
+                if (kFactor < 0) {
                     System.out.println("K must be non-negative.");
                     continue;
                 }
                 break;
-            } catch (InputMismatchException e){
+            } catch (InputMismatchException e) {
                 sc.next();
                 System.out.println("Invalid option.");
             }
@@ -163,7 +166,7 @@ public class Simulator {
         System.out.println();
     }
 
-    private static void displayWorldState(){
+    private static void displayWorldState() {
 
         System.out.println("Graph State:");
         System.out.println("----------------");
@@ -172,17 +175,16 @@ public class Simulator {
         System.out.println("Agents State:");
         System.out.println("----------------");
 
-        for (Agent agent:agents) {
+        for (Agent agent : agents) {
             System.out.println("Agent " + agent.getAgentNum() + ":");
             System.out.println(agent.toString());
             System.out.println();
         }
         System.out.println("----------------");
 
-        if (safeCount == 1){
+        if (safeCount == 1) {
             System.out.println(safeCount + " person is safe");
-        }
-        else{
+        } else {
             System.out.println(safeCount + " people are safe");
         }
 

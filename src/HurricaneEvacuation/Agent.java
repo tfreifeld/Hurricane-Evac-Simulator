@@ -38,12 +38,12 @@ abstract class Agent {
         return carrying;
     }
 
-    void setCarrying(int carrying) {
+    private void setCarrying(int carrying) {
 
         this.carrying = carrying;
     }
 
-    int getNumOfMoves() {
+    private int getNumOfMoves() {
         return numOfMoves;
     }
 
