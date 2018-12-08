@@ -6,6 +6,9 @@ abstract class Agent {
     Vertex location;
     private int carrying = 0;
     private int numOfMoves = 0;
+    private int saved = 0;
+    private int numOfExpansions = -1;
+
 
     abstract Move makeOperation();
 
@@ -18,6 +21,7 @@ abstract class Agent {
         setLocation(target);
         if (target.isShelter()) {
             Simulator.setSafeCount(Simulator.getSafeCount() + getCarrying());
+            saved += getCarrying();
             setCarrying(0);
         } else {
             setCarrying(getCarrying() + target.getPersons());
@@ -49,6 +53,24 @@ abstract class Agent {
 
     void increaseMoves() {
         this.numOfMoves++;
+    }
+
+    int getSaved() {
+        return saved;
+    }
+
+    int getNumOfExpansions() {
+        return numOfExpansions;
+    }
+
+    void setNumOfExpansions(int numOfExpansions) {
+        this.numOfExpansions = numOfExpansions;
+    }
+
+    void performanceMeasure(){
+
+        System.out.println(getSaved());
+
     }
 
     @Override

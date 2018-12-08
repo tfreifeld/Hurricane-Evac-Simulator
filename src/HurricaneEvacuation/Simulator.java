@@ -6,7 +6,6 @@ import java.util.*;
 public class Simulator {
 
     private static ArrayList<Agent> agents = new ArrayList<>();
-
     private static Graph graph;
     private static int deadline;
     private static double time = 0;
@@ -28,6 +27,7 @@ public class Simulator {
         }
 
         getGraph().displayGraphState();
+        System.out.println();
 
         while (time < getDeadline()) {
             for (int i = 0; i < agents.size() && time < getDeadline(); i++) {
@@ -41,8 +41,14 @@ public class Simulator {
 
         System.out.println("Deadline has been reached!");
 
+        System.out.println("Performance measure:");
+        for (Agent agent : agents) {
+            System.out.println("Agent " + agent.agentNum + ":");
+            agent.performanceMeasure();
 
-        //sc.close();
+        }
+
+        sc.close();
 
 
     }
@@ -168,9 +174,9 @@ public class Simulator {
 
     private static void displayWorldState() {
 
-        System.out.println("Graph State:");
+       /* System.out.println("Graph State:");
         System.out.println("----------------");
-        //graph.displayGraphState();
+        graph.displayGraphState();*/
 
         System.out.println("Agents State:");
         System.out.println("----------------");
@@ -189,7 +195,7 @@ public class Simulator {
         }
 
         System.out.println("Time: " + time);
-        System.out.println();
+        System.out.println("\n\n");
 
     }
 

@@ -102,12 +102,12 @@ class Vertex {
         for (Map.Entry<Integer, Integer> next : peopleMap.entrySet()) {
             int targetVertex = next.getKey();
             double length = new GreedyAgent.UniformSearch(this,
-                    node -> node.getState().getLocation().getId() == targetVertex)
+                    node -> node.getState().getLocation().getId() == targetVertex, null)
                     .run().getPathCost();
             lengthsToPeople.put(targetVertex, length);
         }
         this.lengthToClosestShelter = new GreedyAgent.UniformSearch(
-                this, node -> node.getState().getLocation().isShelter())
+                this, node -> node.getState().getLocation().isShelter(), null)
                 .run().getPathCost();
 
     }

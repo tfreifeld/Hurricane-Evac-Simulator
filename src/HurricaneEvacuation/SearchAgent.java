@@ -6,6 +6,7 @@ import java.util.Map;
 abstract class SearchAgent extends Agent {
 
     private Node node;
+    private boolean finishedSearch;
 
     SearchAgent(int agentNum) {
 
@@ -13,20 +14,27 @@ abstract class SearchAgent extends Agent {
         this.node = null;
     }
 
-    abstract HeuristicSearch getSearch(Vertex location);
-
     @Override
     Move makeOperation() {
+
+        if(finishedSearch){
+            /*NoOp*/
+            return new Move(this, this.getLocation(), null);
+
+        }
 
         if (this.node == null) {
 
             State currentState =
                     new State(Simulator.getInitialPeopleMap(), location, Simulator.getTotalPeople());
 
-            this.node = getSearch(this.getLocation()).run();
+            Search search = getSearch(this);
+            this.node = search.run();
+
 
             if (this.node == null) {
                 /*If no path has been found -> NoOp*/
+                finishedSearch = true;
                 return new Move(this, this.getLocation(), null);
             }
 
@@ -49,15 +57,31 @@ abstract class SearchAgent extends Agent {
         Move move = new Move(this, this.node.getState().getLocation(), edge);
 
         this.node = this.node.getChosenChild();
+        if (this.node == null){
+            finishedSearch = true;
+        }
 
         return move;
     }
 
+
+    @Override
+    void performanceMeasure() {
+
+        System.out.println("f = -1: " + ((-1 * getSaved()) + getNumOfExpansions()));
+        System.out.println("f = -100: " + ((-100 * getSaved()) + getNumOfExpansions()));
+        System.out.println("f = -10000: " + ((-10000 * getSaved()) + getNumOfExpansions()));
+
+    }
+
+    abstract HeuristicSearch getSearch(Agent agent);
+
+
     static abstract class HeuristicSearch extends Search {
 
-        HeuristicSearch() {
+        HeuristicSearch(Agent agent) {
             super(node -> (node.getPathCost() > Simulator.getDeadline()) ||
-                    (node.getState().getLeftToSave() == 0));
+                    (node.getState().getLeftToSave() == 0), agent);
         }
     }
 

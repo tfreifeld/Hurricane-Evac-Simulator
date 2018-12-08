@@ -7,15 +7,15 @@ class GreedySearchAgent extends SearchAgent {
     }
 
     @Override
-    HeuristicSearch getSearch(Vertex location) {
-        return new GreedyHeuristicSearch(location);
+    HeuristicSearch getSearch(Agent agent) {
+        return new GreedyHeuristicSearch(agent);
     }
 
     static private class GreedyHeuristicSearch extends HeuristicSearch{
 
-        GreedyHeuristicSearch(Vertex location) {
-            super();
-            this.fringe.add(new GreedyHeuristicNode(location));
+        GreedyHeuristicSearch(Agent agent) {
+            super(agent);
+            this.fringe.add(new GreedyHeuristicNode(agent.getLocation()));
         }
 
         @Override

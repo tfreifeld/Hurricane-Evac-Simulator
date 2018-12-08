@@ -7,15 +7,15 @@ class AStarSearchAgent extends SearchAgent {
     }
 
     @Override
-    HeuristicSearch getSearch(Vertex location) {
-        return new AStarHeuristicSearch(location);
+    HeuristicSearch getSearch(Agent agent) {
+        return new AStarHeuristicSearch(agent);
     }
 
     static private class AStarHeuristicSearch extends HeuristicSearch{
 
-        AStarHeuristicSearch(Vertex location) {
-            super();
-            this.fringe.add(new AStarHeuristicNode(location));
+        AStarHeuristicSearch(Agent agent) {
+            super(agent);
+            this.fringe.add(new AStarHeuristicNode(agent.getLocation()));
         }
 
         @Override

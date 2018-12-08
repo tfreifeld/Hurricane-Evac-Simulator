@@ -27,9 +27,11 @@ class GreedyAgent extends Agent {
         if (this.path == null) {
             /*If a target has not yet been set */
             if (getCarrying() > 0) {
-                this.path = new UniformSearch(getLocation(), node -> node.getState().getLocation().isShelter()).run();
+                this.path = new UniformSearch
+                        (getLocation(), node -> node.getState().getLocation().isShelter(), this).run();
             } else {
-                this.path = new UniformSearch(getLocation(), node -> node.getState().getLocation().getPersons() > 0).run();
+                this.path = new UniformSearch
+                        (getLocation(), node -> node.getState().getLocation().getPersons() > 0, this).run();
                 if (this.path != null){
                     this.path.getState().getLocation().registerListener(() -> path = null);
                 }
@@ -71,8 +73,8 @@ class GreedyAgent extends Agent {
 
     static class UniformSearch extends Search {
 
-        UniformSearch(Vertex location, Predicate<Node> goalTest) {
-            super(goalTest);
+        UniformSearch(Vertex location, Predicate<Node> goalTest, Agent agent) {
+            super(goalTest, agent);
             this.fringe.add(new UniformSearchNode(location));
         }
 
