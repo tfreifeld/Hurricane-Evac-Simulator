@@ -7,15 +7,15 @@ class AStarSearchAgent extends SearchAgent {
     }
 
     @Override
-    HeuristicSearch getSearch(Agent agent) {
-        return new AStarHeuristicSearch(agent);
+    HeuristicSearch getSearch(Agent agent, State startState) {
+        return new AStarHeuristicSearch(agent,startState, this.getCarrying());
     }
 
-    static private class AStarHeuristicSearch extends HeuristicSearch{
+    static class AStarHeuristicSearch extends HeuristicSearch{
 
-        AStarHeuristicSearch(Agent agent) {
+        AStarHeuristicSearch(Agent agent, State startState, int carrying) {
             super(agent);
-            this.fringe.add(new AStarHeuristicNode(agent.getLocation()));
+            this.fringe.add(new AStarHeuristicNode(startState, carrying));
         }
 
         @Override
@@ -28,8 +28,8 @@ class AStarSearchAgent extends SearchAgent {
 
     static private class AStarHeuristicNode extends HeuristicNode{
 
-        AStarHeuristicNode(Vertex location) {
-            super(location);
+        AStarHeuristicNode(State startState, int carrying) {
+            super(startState, carrying);
         }
 
         AStarHeuristicNode(Vertex location, HeuristicNode parent, Edge edge) {

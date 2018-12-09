@@ -28,14 +28,8 @@ abstract class Search {
 
             Node currentNode = fringe.poll();
 
-            if (goalTest.test(currentNode)) {
-                if (agent != null) {
-                    /* This search class is also used to find shortest paths
-                    * for vertices in class Vertex. Then agent will be null */
-                    agent.setNumOfExpansions(explored.size());
-                }
-                return currentNode;
-            }
+            if (checkReturnCondition(currentNode)) return currentNode;
+
 
             explored.put(currentNode.getState(), currentNode);
 
@@ -69,6 +63,18 @@ abstract class Search {
                 }
             }
         }
+    }
+
+    boolean checkReturnCondition(Node currentNode) {
+        if (goalTest.test(currentNode)) {
+            if (agent != null) {
+                /* This search class is also used to find shortest paths
+                * for vertices in class Vertex. Then agent will be null */
+                agent.setNumOfExpansions(explored.size());
+            }
+            return true;
+        }
+        return false;
     }
 
     abstract Node createChildNode(Edge edge, Node currentNode);

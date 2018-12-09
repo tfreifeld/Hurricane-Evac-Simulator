@@ -15,7 +15,7 @@ class GreedyAgent extends Agent {
     @Override
     public Move makeOperation() {
 
-        //TODO: add support for edges that become block along the run
+        //TODO: add support for edges that become blocked along the run
 
         if (this.path != null) {
             if (this.path.getState().getLocation().equals(this.getLocation())) {

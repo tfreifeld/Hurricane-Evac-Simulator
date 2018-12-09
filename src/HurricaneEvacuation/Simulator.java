@@ -123,6 +123,19 @@ public class Simulator {
                     break;
                 }
                 case "r": {
+                    System.out.println("Please enter expansions limit:");
+                    int limit;
+                    while(true) {
+                        try {
+                            limit = sc.nextInt();
+                            break;
+                        } catch (InputMismatchException e) {
+                            sc.next();
+                            System.out.println("Invalid option.");
+                        }
+                    }
+
+                    agents.add(new RTAStarSearchAgent(i + 1, limit));
                     break;
                 }
             }

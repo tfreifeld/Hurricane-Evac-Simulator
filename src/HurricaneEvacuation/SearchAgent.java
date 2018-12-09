@@ -2,6 +2,7 @@ package HurricaneEvacuation;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Predicate;
 
 abstract class SearchAgent extends Agent {
 
@@ -25,10 +26,9 @@ abstract class SearchAgent extends Agent {
 
         if (this.node == null) {
 
-            State currentState =
-                    new State(Simulator.getInitialPeopleMap(), location, Simulator.getTotalPeople());
+            State stateAtSearchStart = getSearchStartState();
 
-            Search search = getSearch(this);
+            Search search = getSearch(this,stateAtSearchStart);
             this.node = search.run();
 
 
@@ -38,7 +38,7 @@ abstract class SearchAgent extends Agent {
                 return new Move(this, this.getLocation(), null);
             }
 
-            while (!(this.node.getParent().getState().equals(currentState))) {
+            while (!(this.node.getParent().getState().equals(stateAtSearchStart))) {
                 this.node.getParent().setChosenChild(this.node);
                 this.node = this.node.getParent();
             }
@@ -56,12 +56,18 @@ abstract class SearchAgent extends Agent {
         }
         Move move = new Move(this, this.node.getState().getLocation(), edge);
 
-        this.node = this.node.getChosenChild();
-        if (this.node == null){
+        if(getGoalTest().test(this.node)){
             finishedSearch = true;
+        }
+        else{
+            this.node = this.node.getChosenChild();
         }
 
         return move;
+    }
+
+    State getSearchStartState() {
+        return new State(Simulator.getInitialPeopleMap(), location, Simulator.getTotalPeople());
     }
 
 
@@ -74,15 +80,19 @@ abstract class SearchAgent extends Agent {
 
     }
 
-    abstract HeuristicSearch getSearch(Agent agent);
+    private static Predicate<Node> getGoalTest() {
+        return node -> (node.getPathCost() > Simulator.getDeadline()) ||
+                (node.getState().getLeftToSave() == 0);
+    }
 
+    abstract HeuristicSearch getSearch(Agent agent, State startState);
 
     static abstract class HeuristicSearch extends Search {
 
         HeuristicSearch(Agent agent) {
-            super(node -> (node.getPathCost() > Simulator.getDeadline()) ||
-                    (node.getState().getLeftToSave() == 0), agent);
+            super(getGoalTest(), agent);
         }
+
     }
 
     static abstract class HeuristicNode extends Node {
@@ -90,12 +100,12 @@ abstract class SearchAgent extends Agent {
         private int carrying;
         private double evaluationValue;
 
-        HeuristicNode(Vertex location) {
+        HeuristicNode(State startState, int carrying) {
             super();
 
-            this.carrying = 0;
+            this.carrying = carrying;
 
-            this.state = new State(Simulator.getInitialPeopleMap(), location, Simulator.getTotalPeople());
+            this.state = startState;
             this.evaluationValue = computeEvaluationFunction();
         }
 
@@ -109,9 +119,11 @@ abstract class SearchAgent extends Agent {
             this.pathCost = parent.getPathCost()
                     + edge.getWeight() * (1 + Simulator.getKFactor() * this.carrying);
 
-            if (location.getPersons() > 0) {
-                this.carrying += location.getPersons();
-                tempPeopleMap.replace(location.getId(), 0);
+            if (tempPeopleMap.get(location.getId()) != null) {
+                if (tempPeopleMap.get(location.getId()) > 0) {
+                    this.carrying += location.getPersons();
+                    tempPeopleMap.replace(location.getId(), 0);
+                }
             }
             int tempLeftToSave = parent.getState().getLeftToSave();
 
@@ -135,7 +147,6 @@ abstract class SearchAgent extends Agent {
 
             int result = 0;
 
-            /*TODO: consider adding a condition if this a goal test then return zero*/
 
             HashMap<Integer, Double> lengthsToPeopleMap = getState().getLocation().getLengthsToPeople();
             for (Map.Entry<Integer, Integer> entry : getState().getPeopleMap().entrySet()) {
