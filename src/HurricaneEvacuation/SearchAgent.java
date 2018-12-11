@@ -127,14 +127,16 @@ abstract class SearchAgent extends Agent {
             }
             int tempLeftToSave = parent.getState().getLeftToSave();
 
+
             if (location.isShelter()) {
                 tempLeftToSave -= this.carrying;
-                this.carrying = 0;
             }
-
 
             this.state = new State(tempPeopleMap, location, tempLeftToSave);
             this.evaluationValue = computeEvaluationFunction();
+            if (location.isShelter()){
+                this.carrying = 0;
+            }
         }
 
         int getCarrying() {
@@ -153,9 +155,9 @@ abstract class SearchAgent extends Agent {
                 if (entry.getValue() > 0) {
                     double lengthToShelter =
                             Simulator.getGraph().getVertex(entry.getKey()).getLengthToClosestShelter()
-                                    * (1 + ((getCarrying() + entry.getValue()) * Simulator.getKFactor()));
+                                 /*   * (1 + ((getCarrying() + entry.getValue()) * Simulator.getKFactor()))*/;
                     double lengthToPeople = (lengthsToPeopleMap.get(entry.getKey())
-                            * (1 + getCarrying() * Simulator.getKFactor()));
+                            /* * (1 + getCarrying() * Simulator.getKFactor())*/);
                     if (getPathCost() + lengthToPeople + lengthToShelter > Simulator.getDeadline()) {
                         result += entry.getValue() * 100;
                     }

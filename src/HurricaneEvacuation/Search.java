@@ -40,7 +40,9 @@ abstract class Search {
                 }
 
                 Node child = createChildNode(nextEdge, currentNode);
-
+            /*    if (child.getPathCost() > Simulator.getDeadline()){
+                    continue;
+                }*/
                 boolean inFringe = false;
 
                 for (Node node : fringe) {
@@ -57,13 +59,13 @@ abstract class Search {
                     }
                 }
                 if (!inFringe) {
-                    if (!explored.containsKey(child.getState())) {
+                    //if (!explored.containsKey(child.getState())) {
                         fringe.add(child);
                     }
                 }
             }
         }
-    }
+    //}
 
     boolean checkReturnCondition(Node currentNode) {
         if (goalTest.test(currentNode)) {
